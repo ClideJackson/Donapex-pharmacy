@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DONAPEX Pharmacy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EAF5E6;
+    --panel: #D2E8C6;
+    --primary: #00833E;
+    --primary-dark: #005C2B;
+    --accent: #FFC72C;
+    --accent-dark: #E8AD00;
+    --ink: #1A2417;
+    --ink-soft: #57645A;
+    --line: #C3DEB6;
+    --white: #FFFFFF;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Fraunces', serif;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--primary);
+    border-bottom: 3px solid var(--accent);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+  }
+  .logo {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
+    color: #FFFFFF;
+  }
+  .logo span { color: var(--accent); }
+  nav a {
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #E7F5E2;
+    margin-left: 28px;
+  }
+  nav a:hover { color: var(--accent); }
+  nav { display: flex; }
+
+  /* Hero */
+  .hero {
+    padding: 64px 24px 72px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+    background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
+    margin: 0 0 0 0;
+  }
+  .hero.wrap { max-width: none; }
+  .hero-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 48px;
+    align-items: center;
+    width: 100%;
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: block;
+  }
+  .hero h1 {
+    font-size: clamp(2.1rem, 4vw, 3.1rem);
+    font-weight: 600;
+    line-height: 1.08;
+    margin-bottom: 18px;
+    color: #FFFFFF;
+  }
+  .hero p.lead {
+    font-size: 1.08rem;
+    color: #E7F5E2;
+    max-width: 46ch;
+    margin-bottom: 28px;
+  }
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 22px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary {
+    background: var(--accent);
+    color: #2A1B04;
+    box-shadow: 0 4px 14px rgba(232,163,61,0.35);
+  }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-outline {
+    background: transparent;
+    border-color: rgba(255,255,255,0.6);
+    color: #FFFFFF;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.12); }
+
+  /* Status card - signature element */
+  .status-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+    justify-self: end;
+    width: 100%;
+    max-width: 340px;
+  }
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 0 4px rgba(0,131,62,0.16);
+    flex-shrink: 0;
+  }
+  .dot.closed {
+    background: #C2483A;
+    box-shadow: 0 0 0 4px rgba(194,72,58,0.16);
+  }
+  .status-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+  .status-sub {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin: 0 0 20px 21px;
+  }
+  .hours-grid {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+  .hours-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    color: var(--ink-soft);
+  }
+  .hours-row.today {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* Section shell */
+  section { padding: 56px 24px; }
+  .section-head {
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto 40px;
+  }
+  .section-head .eyebrow { text-align: center; }
+  .section-head h2 { font-size: 2rem; margin-bottom: 10px; }
+  .section-head p { color: var(--ink-soft); }
+
+  /* Services */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .service-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .service-card:hover {
+    background: var(--white);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  .service-card .icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+    font-size: 1.2rem;
+    transition: background 0.2s ease;
+  }
+  .service-card:hover .icon {
+    background: var(--panel);
+  }
+  .service-card h3 { font-size: 1.05rem; margin-bottom: 6px; }
+  .service-card p { font-size: 0.9rem; color: var(--ink-soft); margin: 0; }
+
+  /* About */
+  .about {
+    background: var(--panel);
+    border-radius: 20px;
+    margin: 0 24px;
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .about h2 { font-size: 1.8rem; margin-bottom: 14px; }
+  .about p { color: var(--ink-soft); }
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .stat { }
+  .stat .num {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    display: block;
+  }
+  .stat .label {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  /* Contact + form */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 40px;
+  }
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .contact-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .contact-item .ic {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--primary);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+  .contact-item .txt-label { font-size: 0.82rem; color: var(--ink-soft); }
+  .contact-item .txt-value { font-weight: 500; font-size: 1rem; }
+  .contact-item a { text-decoration: none; }
+  .contact-item a:hover { color: var(--primary-dark); }
+
+  form {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+  .form-row { margin-bottom: 16px; }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  .form-note {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    line-height: 1.5;
+  }
+  .form-success {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    color: var(--primary-dark);
+    margin-bottom: 16px;
+  }
+  .form-error {
+    display: none;
+    background: #FDECEA;
+    border: 1px solid #C2483A;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    color: #8A2E24;
+    margin-bottom: 16px;
+  }
+  .btn[disabled] {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 780px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero { padding-top: 40px; }
+    .about { grid-template-columns: 1fr; padding: 32px; margin: 0 16px; }
+    .contact-grid { grid-template-columns: 1fr; }
+    nav a { margin-left: 16px; font-size: 0.85rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .btn:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner wrap" style="padding-left:0;padding-right:0;">
+    <div class="logo">DONA<span>PEX</span></div>
+    <nav>
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="eyebrow">Community Pharmacy</span>
+      <h1>Trusted care, right in your neighbourhood.</h1>
+      <p class="lead">DONAPEX is here for your everyday health needs — prescriptions, advice, and a team that knows you by name.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-primary">Request a callback</a>
+        <a href="tel:0715737749" class="btn btn-outline">Call now</a>
+      </div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-row">
+        <span class="dot" id="statusDot"></span>
+        <span class="status-label" id="statusLabel">Checking hours…</span>
+      </div>
+      <p class="status-sub" id="statusSub">&nbsp;</p>
+      <div class="hours-grid" id="hoursGrid"></div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">What we offer</span>
+      <h2>Services</h2>
+      <p>A few of the ways we help keep our community healthy.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="icon">℞</div>
+        <h3>Prescription dispensing</h3>
+        <p>Fast, accurate filling of new and repeat prescriptions.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">🔄</div>
+        <h3>Chronic medication refills</h3>
+        <p>Ongoing management for chronic conditions, with reminders.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">💉</div>
+        <h3>Vaccinations</h3>
+        <p>Flu shots and other common vaccinations, no appointment needed.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">🩺</div>
+        <h3>Health screenings</h3>
+        <p>Blood pressure, glucose, and general wellness checks.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">💬</div>
+        <h3>Pharmacist advice</h3>
+        <p>One-on-one guidance on medicines, dosage, and interactions.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">🚗</div>
+        <h3>Delivery for those who can't travel</h3>
+        <p>Home delivery support for elderly and housebound patients.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="about">
+    <div>
+      <span class="eyebrow">Who we are</span>
+      <h2>Care that knows your name.</h2>
+      <p>DONAPEX is an independent, community-focused pharmacy. We believe healthcare should feel personal — so whether you're picking up a monthly prescription or just need advice, our team takes the time to actually help.</p>
+    </div>
+    <div class="about-stats">
+      <div class="stat"><span class="num">9–5</span><span class="label">Open daily</span></div>
+      <div class="stat"><span class="num">1:1</span><span class="label">Pharmacist advice</span></div>
+      <div class="stat"><span class="num">Local</span><span class="label">Independently run</span></div>
+      <div class="stat"><span class="num">Home</span><span class="label">Delivery support</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Get in touch</span>
+      <h2>Contact & hours</h2>
+      <p>Reach us directly, or leave your details and we'll call you back.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="ic">📞</div>
+          <div>
+            <div class="txt-label">Phone</div>
+            <a class="txt-value" href="tel:0715737749">071 573 7749</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ic">✉️</div>
+          <div>
+            <div class="txt-label">Email</div>
+            <a class="txt-value" href="mailto:jackymashimbhy@gmail.com">jackymashimbhy@gmail.com</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ic">🕒</div>
+          <div>
+            <div class="txt-label">Hours</div>
+            <div class="txt-value">Mon–Sat, 9:00 AM – 5:00 PM</div>
+          </div>
+        </div>
+      </div>
+
+      <form id="callbackForm">
+        <div class="form-success" id="formSuccess">Thanks — we've noted your request and will call you back as soon as we can.</div>
+        <div class="form-error" id="formError">Something went wrong sending your request. Please call us directly at 081 002 0325.</div>
+        <div class="form-row">
+          <label for="name">Your name</label>
+          <input type="text" id="name" name="name" required placeholder="e.g. Thabo Nkosi">
+        </div>
+        <div class="form-row">
+          <label for="phone">Phone number</label>
+          <input type="tel" id="phone" name="phone" required placeholder="e.g. 082 123 4567">
+        </div>
+        <div class="form-row">
+          <label for="reason">What's this about?</label>
+          <select id="reason" name="reason">
+            <option>Prescription refill</option>
+            <option>New prescription</option>
+            <option>Delivery request</option>
+            <option>General question</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="notes">Anything else we should know?</label>
+          <textarea id="notes" name="notes" placeholder="Optional — e.g. medication name, best time to call"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submitBtn" style="width:100%; justify-content:center;">Request callback</button>
+        <p class="form-note">This form sends a callback request only — it doesn't place a medicine order. A pharmacist will call to confirm and, if needed, arrange collection or delivery in line with pharmacy regulations.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © <span id="year"></span> DONAPEX Pharmacy. Mon–Sat, 9:00 AM – 5:00 PM.
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Live open/closed status — reads visitor's local time
+  function updateStatus() {
+    const now = new Date();
+    const day = now.getDay(); // 0 Sun - 6 Sat
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const openHour = 9, closeHour = 17;
+    const isSunday = day === 0;
+    const withinHours = hour >= openHour && hour < closeHour;
+    const isOpen = !isSunday && withinHours;
+
+    const dot = document.getElementById('statusDot');
+    const label = document.getElementById('statusLabel');
+    const sub = document.getElementById('statusSub');
+
+    if (isOpen) {
+      dot.classList.remove('closed');
+      label.textContent = 'Open now';
+      const minsLeft = (closeHour - hour) * 60 - minute;
+      const hrsLeft = Math.floor(minsLeft / 60);
+      sub.textContent = hrsLeft >= 1 ? `Closes at 5:00 PM · about ${hrsLeft}h left` : `Closes at 5:00 PM · closing soon`;
+    } else {
+      dot.classList.add('closed');
+      label.textContent = 'Closed';
+      if (isSunday) {
+        sub.textContent = 'Closed Sundays · opens tomorrow at 9:00 AM';
+      } else if (hour < openHour) {
+        sub.textContent = `Opens today at 9:00 AM`;
+      } else {
+        sub.textContent = `Opens tomorrow at 9:00 AM`;
+      }
+    }
+
+    const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const grid = document.getElementById('hoursGrid');
+    grid.innerHTML = '';
+    for (let d = 1; d <= 6; d++) {
+      const row = document.createElement('div');
+      row.className = 'hours-row' + (d === day ? ' today' : '');
+      row.innerHTML = `<span>${days[d]}</span><span>9:00 – 17:00</span>`;
+      grid.appendChild(row);
+    }
+    const sunRow = document.createElement('div');
+    sunRow.className = 'hours-row' + (day === 0 ? ' today' : '');
+    sunRow.innerHTML = `<span>Sunday</span><span>Closed</span>`;
+    grid.appendChild(sunRow);
+  }
+  updateStatus();
+  setInterval(updateStatus, 60000);
+
+  //Form//Form//form
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xdaqnedw';
+
+  const callbackForm = document.getElementById('callbackForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const successBox = document.getElementById('formSuccess');
+  const errorBox = document.getElementById('formError');
+
+  callbackForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    successBox.style.display = 'none';
+    errorBox.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    const formData = new FormData(callbackForm);
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.ok) {
+        successBox.style.display = 'block';
+        callbackForm.reset();
+      } else {
+        errorBox.style.display = 'block';
+      }
+    } catch (err) {
+      errorBox.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Request callback';
+    }
+  });
+</script>
+
+</body>
+</html>
