@@ -590,7 +590,13 @@
       } else if (hour < openHour) {
         sub.textContent = `Opens today at 9:00 AM`;
       } else {
-        sub.textContent = `Opens tomorrow at 9:00 AM`;
+        const tomorrow = (day + 1) % 7;
+        if(tomorrow === 0) {
+          sub.textContent = 'opens Monday at 9:00 AM';
+        }
+        else{
+          sub.textContent = `Opens tomorrow at 9:00 AM`;
+        }
       }
     }
 
