@@ -32,6 +32,7 @@
       font-family: 'Inter', sans-serif;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     h1, h2, h3 {
@@ -100,7 +101,37 @@
       margin-left: 28px;
     }
     nav a:hover { color: var(--accent); }
-    nav { display: flex; }
+    nav { display: flex; align-items: center; }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: #FFFFFF;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      background: var(--primary-dark);
+      padding: 12px 24px 18px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: #E7F5E2;
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 10px 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    @media (max-width: 680px) {
+      .desktop-nav { display: none; }
+      .hamburger { display: block; }
+    }
 
     /* Hero */
     .hero {
@@ -561,32 +592,15 @@
       .about { grid-template-columns: 1fr; padding: 32px; margin: 0 16px; text-align: center; }
       .about-illustration { max-width: 160px; margin: 0 auto; }
       .contact-grid { grid-template-columns: 1fr; }
-      nav a { margin-left: 16px; font-size: 0.85rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .btn:hover { transform: none; }
     }
-
-    .dev-banner {
-      background: #FFC72C;
-      color: #2A1B04;
-      text-align: center;
-      padding: 10px 20px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border-bottom: 2px solid #E8AD00;
-    }
-
   </style>
 </head>
 <body>
-
-<div class="dev-banner">
-  ⚠️ WEBSITE UNDER DEVELOPMENT — Features and information may change or stop working without notice.
-  For assistance, contact <strong>081 002 0325</strong>.
-</div>
 
 <div class="location-bar">
   <a href="https://www.google.com/maps/search/?api=1&query=Shop+No+2%2C+15+Gardens+Street%2C+Luxavi+Centre%2C+Kinross%2C+2270%2C+Mpumalanga" target="_blank" rel="noopener">
@@ -598,12 +612,21 @@
 <header>
   <div class="header-inner wrap" style="padding-left:0;padding-right:0;">
     <div class="logo">DONA<span>PEX</span></div>
-    <nav>
+    <nav class="desktop-nav">
       <a href="#services">Services</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
       <button id="staffBtn" class="staff-btn">Staff Login</button>
     </nav>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#services">Services</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+    <button id="staffBtnMobile" class="staff-btn" style="width:100%; text-align:center;">Staff Login</button>
   </div>
 </header>
 
@@ -714,7 +737,7 @@
           <div class="ic">📍</div>
           <div>
             <div class="txt-label">Address</div>
-            <div class="txt-value">Shop No 2, 15 Gardens Street<br>Luxavi Centre - Kinross - 2270<br>Mpumalanga</div>
+            <div class="txt-value">Shop No 2 - 15 Gardens Street<br>Luxavi Centre - Kinross - 2270<br>Mpumalanga</div>
           </div>
         </div>
         <div class="contact-item">
@@ -799,7 +822,8 @@
       </div>
       <button class="btn btn-outline" id="logoutBtn" style="border-color: var(--primary); color: var(--primary-dark);">Log out</button>
     </div>
-    <p class="stock-header disclaimer">Note: stock data is saved on this device/browser only (not shared across other computers). It will only persist once this page is opened as its own hosted site.</p>
+    <p class="stock-header disclaimer">Note: stock data is shared and synced across any computer or phone that logs in — it's meant as a simple internal tracker, not a secure medical records system.</p>
+    <div class="modal-error" id="stockLoadError" style="display:none; margin-bottom:16px;">Couldn't reach the stock database. Check your internet connection and try logging out and back in.</div>
 
     <form class="stock-add-form" id="addStockForm">
       <div class="field" style="grid-column: 1 / -1;">
@@ -877,13 +901,25 @@
   updateStatus();
   setInterval(updateStatus, 60000);
 
+  // ---------- Mobile nav ----------
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburgerBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+  });
+  // Close mobile menu when a nav link is tapped
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  });
+
   // ---------- Staff login + Stock Manager ----------
-  const STAFF_PASSWORD = 'donapex2026'; // change this to whatever your uncle wants
+  const STAFF_PASSWORD = 'donapex2026';
   let isStaffLoggedIn = false;
   let stockItems = [];
 
   const loginModal = document.getElementById('loginModal');
   const staffBtn = document.getElementById('staffBtn');
+  const staffBtnMobile = document.getElementById('staffBtnMobile');
   const closeLoginModal = document.getElementById('closeLoginModal');
   const cancelLogin = document.getElementById('cancelLogin');
   const submitLogin = document.getElementById('submitLogin');
@@ -892,16 +928,20 @@
   const stockPanel = document.getElementById('stockPanel');
   const logoutBtn = document.getElementById('logoutBtn');
 
-  staffBtn.addEventListener('click', () => {
+  function handleStaffBtnClick() {
     if (isStaffLoggedIn) {
+      mobileMenu.classList.remove('open');
       stockPanel.scrollIntoView({ behavior: 'smooth' });
       return;
     }
+    mobileMenu.classList.remove('open');
     loginModal.classList.add('open');
     staffPasswordInput.value = '';
     loginError.style.display = 'none';
     staffPasswordInput.focus();
-  });
+  }
+  staffBtn.addEventListener('click', handleStaffBtnClick);
+  staffBtnMobile.addEventListener('click', handleStaffBtnClick);
 
   function closeModal() {
     loginModal.classList.remove('open');
@@ -919,6 +959,7 @@
       isStaffLoggedIn = true;
       closeModal();
       staffBtn.textContent = 'Stock Manager';
+      staffBtnMobile.textContent = 'Stock Manager';
       stockPanel.classList.add('open');
       loadStock();
       stockPanel.scrollIntoView({ behavior: 'smooth' });
@@ -930,25 +971,47 @@
   logoutBtn.addEventListener('click', () => {
     isStaffLoggedIn = false;
     staffBtn.textContent = 'Staff Login';
+    staffBtnMobile.textContent = 'Staff Login';
     stockPanel.classList.remove('open');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  function loadStock() {
+  const FIREBASE_DB_URL = 'https://donapex-pharmacy-default-rtdb.europe-west1.firebasedatabase.app';
+
+  async function loadStock() {
+    const errorBox = document.getElementById('stockLoadError');
+    errorBox.style.display = 'none';
+    const emptyState = document.getElementById('stockEmptyState');
+    emptyState.textContent = 'Loading stock…';
+    emptyState.style.display = 'block';
     try {
-      const raw = localStorage.getItem('donapex-stock-items');
-      stockItems = raw ? JSON.parse(raw) : [];
+      const response = await fetch(`${FIREBASE_DB_URL}/stock.json`);
+      if (!response.ok) throw new Error('Bad response: ' + response.status);
+      const data = await response.json();
+      stockItems = Array.isArray(data) ? data.filter(Boolean) : (data ? Object.values(data) : []);
     } catch (err) {
+      console.error('Failed to load stock from Firebase', err);
       stockItems = [];
+      errorBox.style.display = 'block';
     }
+    emptyState.textContent = 'No stock items yet — add your first one above.';
     renderStock();
   }
 
-  function saveStock() {
+  async function saveStock() {
+    const errorBox = document.getElementById('stockLoadError');
     try {
-      localStorage.setItem('donapex-stock-items', JSON.stringify(stockItems));
+      const response = await fetch(`${FIREBASE_DB_URL}/stock.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(stockItems)
+      });
+      if (!response.ok) throw new Error('Bad response: ' + response.status);
+      errorBox.style.display = 'none';
     } catch (err) {
-      console.error('Failed to save stock (localStorage unavailable in this environment)', err);
+      console.error('Failed to save stock to Firebase', err);
+      errorBox.textContent = "Couldn't save that change to the stock database. Check your internet connection.";
+      errorBox.style.display = 'block';
     }
   }
 
