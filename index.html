@@ -974,7 +974,7 @@
             <a href="#services">Services</a>
             <a href="#about">About</a>
             <a href="#contact">Contact</a>
-            <a href="staff.html" class="staff-btn" style="text-decoration:none; display:inline-block;">Staff Login</a>
+            <button id="staffBtn" class="staff-btn">Staff Login</button>
         </nav>
         <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -989,9 +989,7 @@
         <a href="#services">Services</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
-        <a href="staff.html" class="staff-btn"
-           style="width:100%; text-align:center; text-decoration:none; display:block; box-sizing:border-box;">Staff
-            Login</a>
+        <button id="staffBtnMobile" class="staff-btn" style="width:100%; text-align:center;">Staff Login</button>
     </div>
 </header>
 
@@ -1427,6 +1425,121 @@ Amoxicillin"
 
 </section>
 
+<!-- Staff login modal -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal-box">
+        <button class="modal-close-x" id="closeLoginModal">&times;</button>
+        <h3>Staff Login</h3>
+        <p class="sub">Enter the staff password to manage stock.</p>
+        <div class="modal-error" id="loginError">Incorrect password. Please try again.</div>
+        <div class="form-row">
+            <label for="staffPassword">Password</label>
+            <input type="password" id="staffPassword" placeholder="Staff password">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" id="cancelLogin" style="border-color: var(--line); color: var(--ink);">
+                Cancel
+            </button>
+            <button class="btn btn-primary" id="submitLogin">Log in</button>
+        </div>
+    </div>
+</div>
+
+<!-- Stock management panel (staff only) -->
+<section id="stockPanel">
+    <div class="wrap">
+        <div class="stock-header">
+            <div>
+                <span class="eyebrow">Staff Only</span>
+                <h2>Stock Manager</h2>
+            </div>
+            <button class="btn btn-outline" id="logoutBtn"
+                    style="border-color: var(--primary); color: var(--primary-dark);">Log out
+            </button>
+        </div>
+
+        <div class="stock-tabs" style="display:flex; gap:10px; margin-bottom:20px;">
+            <button class="btn btn-outline" id="tabStockBtn"
+                    style="border-color: var(--primary); color: var(--primary-dark);">Stock</button>
+            <button class="btn btn-outline" id="tabOrdersBtn"
+                    style="border-color: var(--line); color: var(--ink);">Orders</button>
+        </div>
+        <div id="stockView">
+        <p class="stock-header disclaimer">Note: stock data is shared and synced across any computer or phone that logs
+            in — it's meant as a simple internal tracker, not a secure medical records system.</p>
+        <div class="modal-error" id="stockLoadError" style="display:none; margin-bottom:16px;">Couldn't reach the stock
+            database. Check your internet connection and try logging out and back in.
+        </div>
+
+        <form class="stock-add-form" id="addStockForm">
+            <div class="field" style="grid-column: 1 / -1;">
+                <div class="modal-error" id="addStockError" style="display:none;"></div>
+            </div>
+            <div class="field">
+                <label for="itemName">Item name</label>
+                <input type="text" id="itemName" placeholder="e.g. Panado 500mg">
+            </div>
+            <div class="field">
+                <label for="itemQty">Quantity</label>
+                <input type="number" id="itemQty" min="0" placeholder="0">
+            </div>
+            <div class="field">
+                <label for="itemThreshold">Low-stock alert below</label>
+                <input type="number" id="itemThreshold" min="0" placeholder="10">
+            </div>
+            <div class="field">
+                <label for="itemExpiry">Expiry date</label>
+                <input type="date" id="itemExpiry">
+            </div>
+            <div class="field">
+                <label for="itemCategory">Category</label>
+                <input type="text" id="itemCategory" placeholder="e.g. Pain relief">
+            </div>
+            <button type="submit" class="btn btn-primary">Add item</button>
+        </form>
+
+        <div class="stock-table-wrap">
+            <table class="stock-table" id="stockTable">
+                <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Expiry</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="stockTableBody"></tbody>
+            </table>
+            <div class="empty-state" id="stockEmptyState" style="display:none;">No stock items yet — add your first one
+                above.
+            </div>
+        </div>
+        </div>
+        <div id="ordersView" style="display:none;">
+            <div class="modal-error" id="ordersLoadError" style="display:none; margin-bottom:16px;">
+                Couldn't reach the orders database. Check your internet connection and try logging out and back in.
+            </div>
+            <div class="stock-table-wrap">
+                <table class="stock-table" id="ordersTable">
+                    <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Contact</th>
+                        <th>Order</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Placed</th>
+                    </tr>
+                    </thead>
+                    <tbody id="ordersTableBody"></tbody>
+                </table>
+                <div class="empty-state" id="ordersEmptyState" style="display:none;">No orders yet.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <footer>
     © <span id="year"></span> DONAPEX Pharmacy. Mon–Fri, 9:00 AM – 6:00 PM | Sat, 9:00 AM - 5:00 PM | Sun, Closed.
 </footer>
@@ -1471,6 +1584,7 @@ Amoxicillin"
     });
 
     // ---------- Staff login + Stock Manager ----------
+    const STAFF_PASSWORD = 'donapex2026';
     let isStaffLoggedIn = false;
     let stockItems = [];
 
