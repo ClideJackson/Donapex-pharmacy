@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DONAPEX Pharmacy — Staff</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+          rel="stylesheet">
+    <style>
+        :root {
+            --bg: #EAF5E6;
+            --panel: #D2E8C6;
+            --primary: #00833E;
+            --primary-dark: #005C2B;
+            --accent: #FFC72C;
+            --accent-dark: #E8AD00;
+            --ink: #1A2417;
+            --ink-soft: #57645A;
+            --line: #C3DEB6;
+            --white: #FFFFFF;
+            --radius: 14px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Fraunces', serif;
+            color: var(--ink);
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        a { color: inherit; }
+
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Top bar */
+        .staff-header {
+            background: var(--primary);
+            border-bottom: 3px solid var(--accent);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: 0.02em;
+            color: #FFFFFF;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .back-link {
+            color: #E7F5E2;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link:hover { color: var(--accent); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 22px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #2A1B04;
+            box-shadow: 0 4px 14px rgba(232, 163, 61, 0.35);
+        }
+
+        .btn-primary:hover { background: var(--accent-dark); }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--line);
+            color: var(--ink);
+        }
+
+        .btn-outline:hover { background: rgba(0,0,0,0.04); }
+
+        .btn[disabled] {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Login gate */
+        #loginGate {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-box {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 36px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+            border: 1px solid var(--line);
+        }
+
+        .login-box h2 { font-size: 1.5rem; margin-bottom: 6px; }
+
+        .login-box .sub {
+            font-size: 0.9rem;
+            color: var(--ink-soft);
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink-soft);
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 9px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--ink);
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 1px;
+        }
+
+        .form-row { margin-bottom: 16px; }
+
+        .modal-error {
+            display: none;
+            font-size: 0.85rem;
+            color: #8A2E24;
+            background: #FDECEA;
+            border: 1px solid #C2483A;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+        }
+
+        /* Stock panel */
+        #stockPanel { display: none; }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stock-header .disclaimer {
+            font-size: 0.78rem;
+            color: var(--ink-soft);
+            background: var(--panel);
+            border-radius: 8px;
+            padding: 8px 12px;
+            max-width: 460px;
+        }
+
+        .stock-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+
+        .stock-add-form {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr) auto;
+            gap: 10px;
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            align-items: end;
+        }
+
+        .stock-add-form .field label {
+            font-size: 0.78rem;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .stock-table-wrap {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        table.stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        table.stock-table th {
+            text-align: left;
+            background: var(--panel);
+            padding: 12px 14px;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--primary-dark);
+        }
+
+        table.stock-table td {
+            padding: 12px 14px;
+            border-top: 1px solid var(--line);
+            vertical-align: middle;
+        }
+
+        table.stock-table tr.low-stock td { background: #FDECEA; }
+        table.stock-table tr.expiring td { background: #FFF8E1; }
+        table.stock-table tr.expired td { background: #F5D7D2; }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            cursor: pointer;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-left: 6px;
+        }
+
+        .tag.low { background: #C2483A; color: white; }
+        .tag.exp { background: var(--accent); color: #2A1B04; }
+        .tag.expired { background: #8A2E24; color: white; }
+
+        .del-btn {
+            background: none;
+            border: none;
+            color: #C2483A;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--ink-soft);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .stock-add-form { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="staff-header">
+    <div class="logo">DONA<span>PEX</span> <span style="font-size:0.8rem; color:#E7F5E2; font-family:'Inter',sans-serif; font-weight:500;">— Staff</span></div>
+    <a class="back-link" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
+        </svg>
+        Back to site
+    </a>
+</div>
+
+<!-- Login gate -->
+<div id="loginGate">
+    <div class="login-box">
+        <h2>Staff Login</h2>
+        <p class="sub">Enter the staff password to manage stock and orders.</p>
+        <div class="modal-error" id="loginError">Incorrect password. Please try again.</div>
+        <div class="form-row">
+            <label for="staffPassword">Password</label>
+            <input type="password" id="staffPassword" placeholder="Staff password">
+        </div>
+        <button class="btn btn-primary" id="submitLogin" style="width:100%; justify-content:center;">Log in</button>
+    </div>
+</div>
+
+<!-- Stock management panel (staff only, shown after login) -->
+<section id="stockPanel">
+    <div class="wrap">
+        <div class="stock-header">
+            <div>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--primary);">Staff Only</span>
+                <h2>Stock Manager</h2>
+            </div>
+            <button class="btn btn-outline" id="logoutBtn" style="border-color: var(--primary); color: var(--primary-dark);">Log out</button>
+        </div>
+
+        <div class="stock-tabs">
+            <button class="btn btn-outline" id="tabStockBtn" style="border-color: var(--primary); color: var(--primary-dark);">Stock</button>
+            <button class="btn btn-outline" id="tabOrdersBtn" style="border-color: var(--line); color: var(--ink);">Orders</button>
+        </div>
+
+        <div id="stockView">
+            <p class="stock-header disclaimer">Note: stock data is shared and synced across any computer or phone that logs in — it's meant as a simple internal tracker, not a secure medical records system.</p>
+            <div class="modal-error" id="stockLoadError" style="display:none; margin-bottom:16px;">Couldn't reach the stock database. Check your internet connection and try logging out and back in.</div>
+
+            <form class="stock-add-form" id="addStockForm">
+                <div class="field" style="grid-column: 1 / -1;">
+                    <div class="modal-error" id="addStockError" style="display:none;"></div>
+                </div>
+                <div class="field">
+                    <label for="itemName">Item name</label>
+                    <input type="text" id="itemName" placeholder="e.g. Panado 500mg">
+                </div>
+                <div class="field">
+                    <label for="itemQty">Quantity</label>
+                    <input type="number" id="itemQty" min="0" placeholder="0">
+                </div>
+                <div class="field">
+                    <label for="itemThreshold">Low-stock alert below</label>
+                    <input type="number" id="itemThreshold" min="0" placeholder="10">
+                </div>
+                <div class="field">
+                    <label for="itemExpiry">Expiry date</label>
+                    <input type="date" id="itemExpiry">
+                </div>
+                <div class="field">
+                    <label for="itemCategory">Category</label>
+                    <input type="text" id="itemCategory" placeholder="e.g. Pain relief">
+                </div>
+                <button type="submit" class="btn btn-primary">Add item</button>
+            </form>
+
+            <div class="stock-table-wrap">
+                <table class="stock-table" id="stockTable">
+                    <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Expiry</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody id="stockTableBody"></tbody>
+                </table>
+                <div class="empty-state" id="stockEmptyState" style="display:none;">No stock items yet — add your first one above.</div>
+            </div>
+        </div>
+
+        <div id="ordersView" style="display:none;">
+            <div class="modal-error" id="ordersLoadError" style="display:none; margin-bottom:16px;">Couldn't reach the orders database. Check your internet connection and try logging out and back in.</div>
+            <div class="stock-table-wrap">
+                <table class="stock-table" id="ordersTable">
+                    <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Contact</th>
+                        <th>Order</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Placed</th>
+                    </tr>
+                    </thead>
+                    <tbody id="ordersTableBody"></tbody>
+                </table>
+                <div class="empty-state" id="ordersEmptyState" style="display:none;">No orders yet.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    const STAFF_PASSWORD = 'donapex2026';
+    const FIREBASE_DB_URL = 'https://donapex-pharmacy-default-rtdb.europe-west1.firebasedatabase.app';
+
+    let stockItems = [];
+    let ordersData = {};
+
+    const loginGate = document.getElementById('loginGate');
+    const stockPanel = document.getElementById('stockPanel');
+    const staffPasswordInput = document.getElementById('staffPassword');
+    const loginError = document.getElementById('loginError');
+    const submitLogin = document.getElementById('submitLogin');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const tabStockBtn = document.getElementById('tabStockBtn');
+    const tabOrdersBtn = document.getElementById('tabOrdersBtn');
+    const stockView = document.getElementById('stockView');
+    const ordersView = document.getElementById('ordersView');
+
+    function handleLogin() {
+        if (staffPasswordInput.value === STAFF_PASSWORD) {
+            loginGate.style.display = 'none';
+            stockPanel.style.display = 'block';
+            loadStock();
+        } else {
+            loginError.style.display = 'block';
+        }
+    }
+
+    submitLogin.addEventListener('click', handleLogin);
+    staffPasswordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    staffPasswordInput.focus();
+
+    logoutBtn.addEventListener('click', () => {
+        stockPanel.style.display = 'none';
+        loginGate.style.display = 'flex';
+        staffPasswordInput.value = '';
+        loginError.style.display = 'none';
+        staffPasswordInput.focus();
+    });
+
+    tabStockBtn.addEventListener('click', () => {
+        stockView.style.display = 'block';
+        ordersView.style.display = 'none';
+        tabStockBtn.style.borderColor = 'var(--primary)';
+        tabStockBtn.style.color = 'var(--primary-dark)';
+        tabOrdersBtn.style.borderColor = 'var(--line)';
+        tabOrdersBtn.style.color = 'var(--ink)';
+    });
+
+    tabOrdersBtn.addEventListener('click', () => {
+        stockView.style.display = 'none';
+        ordersView.style.display = 'block';
+        tabOrdersBtn.style.borderColor = 'var(--primary)';
+        tabOrdersBtn.style.color = 'var(--primary-dark)';
+        tabStockBtn.style.borderColor = 'var(--line)';
+        tabStockBtn.style.color = 'var(--ink)';
+        loadOrders();
+    });
+
+    async function loadStock() {
+        const errorBox = document.getElementById('stockLoadError');
+        errorBox.style.display = 'none';
+        const emptyState = document.getElementById('stockEmptyState');
+        emptyState.textContent = 'Loading stock…';
+        emptyState.style.display = 'block';
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/stock.json`);
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            const data = await response.json();
+            stockItems = Array.isArray(data) ? data.filter(Boolean) : (data ? Object.values(data) : []);
+        } catch (err) {
+            console.error('Failed to load stock from Firebase', err);
+            stockItems = [];
+            errorBox.style.display = 'block';
+        }
+        emptyState.textContent = 'No stock items yet — add your first one above.';
+        renderStock();
+    }
+
+    async function saveStock() {
+        const errorBox = document.getElementById('stockLoadError');
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/stock.json`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(stockItems)
+            });
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            errorBox.style.display = 'none';
+        } catch (err) {
+            console.error('Failed to save stock to Firebase', err);
+            errorBox.textContent = "Couldn't save that change to the stock database. Check your internet connection.";
+            errorBox.style.display = 'block';
+        }
+    }
+
+    function renderStock() {
+        const tbody = document.getElementById('stockTableBody');
+        const emptyState = document.getElementById('stockEmptyState');
+        tbody.innerHTML = '';
+
+        if (stockItems.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        const now = new Date();
+        const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const soon = new Date(todayMidnight);
+        soon.setDate(todayMidnight.getDate() + 30);
+
+        stockItems.forEach((item, idx) => {
+            const isLow = item.threshold != null && item.qty <= item.threshold;
+
+            let isExpired = false;
+            let isExpiring = false;
+            if (item.expiry) {
+                const [y, m, d] = item.expiry.split('-').map(Number);
+                const expiryDate = new Date(y, m - 1, d);
+                if (expiryDate < todayMidnight) {
+                    isExpired = true;
+                } else if (expiryDate <= soon) {
+                    isExpiring = true;
+                }
+            }
+
+            const row = document.createElement('tr');
+            if (isExpired) row.classList.add('expired');
+            else if (isLow) row.classList.add('low-stock');
+            else if (isExpiring) row.classList.add('expiring');
+
+            row.innerHTML = `
+        <td>${escapeHtml(item.name)}
+          ${isExpired ? '<span class="tag expired">Expired</span>' : ''}
+          ${!isExpired && isLow ? '<span class="tag low">Low stock</span>' : ''}
+          ${!isExpired && isExpiring ? '<span class="tag exp">Expiring soon</span>' : ''}
+        </td>
+        <td>${escapeHtml(item.category || '—')}</td>
+        <td>
+          <div class="qty-controls">
+            <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
+          </div>
+        </td>
+        <td>${item.expiry || '—'}</td>
+        <td><button class="del-btn" data-action="del" data-idx="${idx}">Remove</button></td>
+      `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    async function loadOrders() {
+        const errorBox = document.getElementById('ordersLoadError');
+        errorBox.style.display = 'none';
+        const emptyState = document.getElementById('ordersEmptyState');
+        emptyState.textContent = 'Loading orders…';
+        emptyState.style.display = 'block';
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/orders.json`);
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            const data = await response.json();
+            ordersData = data || {};
+        } catch (err) {
+            console.error('Failed to load orders from Firebase', err);
+            ordersData = {};
+            errorBox.style.display = 'block';
+        }
+        emptyState.textContent = 'No orders yet.';
+        renderOrders();
+    }
+
+    function renderOrders() {
+        const tbody = document.getElementById('ordersTableBody');
+        const emptyState = document.getElementById('ordersEmptyState');
+        tbody.innerHTML = '';
+
+        const ids = Object.keys(ordersData).sort((a, b) => {
+            const ta = ordersData[a].createdAt || '';
+            const tb = ordersData[b].createdAt || '';
+            return tb.localeCompare(ta);
+        });
+
+        if (ids.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        ids.forEach(id => {
+            const o = ordersData[id];
+            const row = document.createElement('tr');
+            const placed = o.createdAt ? new Date(o.createdAt).toLocaleString() : '—';
+
+            row.innerHTML = `
+                <td>${escapeHtml(o.customerName || '—')}</td>
+                <td>${escapeHtml(o.phone || '—')}${o.email ? '<br>' + escapeHtml(o.email) : ''}</td>
+                <td>${escapeHtml(o.orderType || '—')}<br><span style="font-size:0.85em;color:var(--ink-soft);">${escapeHtml(o.medicine || '')}</span></td>
+                <td>${escapeHtml(o.collectionMethod || '—')}</td>
+                <td>
+                  <select class="order-status-select" data-id="${id}">
+                    <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="Approved" ${o.status === 'Approved' ? 'selected' : ''}>Approved</option>
+                    <option value="Ready" ${o.status === 'Ready' ? 'selected' : ''}>Ready</option>
+                    <option value="Collected" ${o.status === 'Collected' ? 'selected' : ''}>Collected</option>
+                  </select>
+                </td>
+                <td style="font-size:0.85em;">${placed}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    document.getElementById('ordersTableBody').addEventListener('change', async (e) => {
+        if (!e.target.classList.contains('order-status-select')) return;
+        const id = e.target.dataset.id;
+        const newStatus = e.target.value;
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/orders/${id}.json`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({status: newStatus})
+            });
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            ordersData[id].status = newStatus;
+        } catch (err) {
+            console.error('Failed to update order status', err);
+            const errorBox = document.getElementById('ordersLoadError');
+            errorBox.textContent = "Couldn't save that status change. Check your internet connection.";
+            errorBox.style.display = 'block';
+        }
+    });
+
+    document.getElementById('stockTableBody').addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const idx = parseInt(btn.dataset.idx, 10);
+        const action = btn.dataset.action;
+
+        if (action === 'inc') stockItems[idx].qty++;
+        if (action === 'dec') stockItems[idx].qty = Math.max(0, stockItems[idx].qty - 1);
+        if (action === 'del') stockItems.splice(idx, 1);
+
+        renderStock();
+        saveStock();
+    });
+
+    document.getElementById('addStockForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const errorBox = document.getElementById('addStockError');
+        errorBox.style.display = 'none';
+
+        const name = document.getElementById('itemName').value.trim();
+        const qtyRaw = document.getElementById('itemQty').value;
+        const thresholdVal = document.getElementById('itemThreshold').value;
+        const threshold = thresholdVal ? parseInt(thresholdVal, 10) : null;
+        const expiry = document.getElementById('itemExpiry').value;
+        const category = document.getElementById('itemCategory').value.trim();
+
+        if (!name) {
+            errorBox.textContent = 'Please enter an item name.';
+            errorBox.style.display = 'block';
+            return;
+        }
+        if (qtyRaw === '' || isNaN(parseInt(qtyRaw, 10))) {
+            errorBox.textContent = 'Please enter a quantity.';
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        const qty = parseInt(qtyRaw, 10);
+        stockItems.push({name, qty, threshold, expiry, category});
+        renderStock();
+        saveStock();
+        e.target.reset();
+        document.getElementById('itemName').focus();
+    });
+</script>
+
+</body>
+</html>
