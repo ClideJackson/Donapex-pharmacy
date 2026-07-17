@@ -1,1118 +1,1641 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DONAPEX Pharmacy</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #EAF5E6;
-      --panel: #D2E8C6;
-      --primary: #00833E;
-      --primary-dark: #005C2B;
-      --accent: #FFC72C;
-      --accent-dark: #E8AD00;
-      --ink: #1A2417;
-      --ink-soft: #57645A;
-      --line: #C3DEB6;
-      --white: #FFFFFF;
-      --radius: 14px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DONAPEX Pharmacy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+          rel="stylesheet">
+    <style>
+        :root {
+            --bg: #EAF5E6;
+            --panel: #D2E8C6;
+            --primary: #00833E;
+            --primary-dark: #005C2B;
+            --accent: #FFC72C;
+            --accent-dark: #E8AD00;
+            --ink: #1A2417;
+            --ink-soft: #57645A;
+            --line: #C3DEB6;
+            --white: #FFFFFF;
+            --radius: 14px;
+        }
 
-    * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
-    html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+        }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: 'Inter', sans-serif;
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
 
-    h1, h2, h3 {
-      font-family: 'Fraunces', serif;
-      color: var(--ink);
-      margin: 0;
-      letter-spacing: -0.01em;
-    }
+        h1, h2, h3 {
+            font-family: 'Fraunces', serif;
+            color: var(--ink);
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
 
-    a { color: inherit; }
+        a {
+            color: inherit;
+        }
 
-    .wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
 
-    /* Top location bar */
-    .location-bar {
-      background: var(--primary-dark);
-      padding: 8px 24px;
-      text-align: center;
-    }
-    .location-bar a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #E7F5E2;
-      text-decoration: none;
-      font-size: 0.82rem;
-      font-weight: 500;
-    }
-    .location-bar a:hover {
-      color: var(--accent);
-      text-decoration: underline;
-    }
-    .loc-icon { display: inline-flex; align-items: center; }
+        /* Top location bar */
+        .location-bar {
+            background: var(--primary-dark);
+            padding: 8px 24px;
+            text-align: center;
+        }
 
-    /* Header */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: var(--primary);
-      border-bottom: 3px solid var(--accent);
-    }
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 24px;
-    }
-    .logo {
-      font-family: 'Fraunces', serif;
-      font-weight: 700;
-      font-size: 1.4rem;
-      letter-spacing: 0.02em;
-      color: #FFFFFF;
-    }
-    .logo span { color: var(--accent); }
-    nav a {
-      text-decoration: none;
-      font-size: 0.92rem;
-      font-weight: 500;
-      color: #E7F5E2;
-      margin-left: 28px;
-    }
-    nav a:hover { color: var(--accent); }
-    nav { display: flex; align-items: center; }
+        .location-bar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #E7F5E2;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
 
-    .hamburger {
-      display: none;
-      background: none;
-      border: none;
-      color: #FFFFFF;
-      cursor: pointer;
-      padding: 4px;
-    }
+        .location-bar a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
 
-    .mobile-menu {
-      display: none;
-      flex-direction: column;
-      gap: 4px;
-      background: var(--primary-dark);
-      padding: 12px 24px 18px;
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      color: #E7F5E2;
-      text-decoration: none;
-      font-size: 0.95rem;
-      padding: 10px 4px;
-      border-bottom: 1px solid rgba(255,255,255,0.12);
-    }
+        .loc-icon {
+            display: inline-flex;
+            align-items: center;
+        }
 
-    @media (max-width: 680px) {
-      .desktop-nav { display: none; }
-      .hamburger { display: block; }
-    }
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--primary);
+            border-bottom: 3px solid var(--accent);
+        }
 
-    /* Hero */
-    .hero {
-      padding: 64px 24px 72px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 48px;
-      align-items: center;
-      background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
-      margin: 0 0 0 0;
-    }
-    .hero.wrap { max-width: none; }
-    .hero-inner {
-      max-width: 1080px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 20px;
-      width: 100%;
-      position: relative;
-      z-index: 1;
-    }
-    .hero-watermark {
-      position: absolute;
-      top: 50%;
-      right: -40px;
-      transform: translateY(-50%);
-      width: 340px;
-      height: 340px;
-      opacity: 0.10;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .hero { position: relative; overflow: hidden; }
-    .eyebrow {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 14px;
-      display: block;
-    }
-    .hero h1 {
-      font-size: clamp(2.1rem, 4vw, 3.1rem);
-      font-weight: 600;
-      line-height: 1.08;
-      margin-bottom: 18px;
-      color: #FFFFFF;
-    }
-    .hero p.lead {
-      font-size: 1.08rem;
-      color: #E7F5E2;
-      max-width: 46ch;
-      margin-bottom: 28px;
-    }
-    .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+        }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 13px 22px;
-      border-radius: 999px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      text-decoration: none;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-primary {
-      background: var(--accent);
-      color: #2A1B04;
-      box-shadow: 0 4px 14px rgba(232,163,61,0.35);
-    }
-    .btn-primary:hover { background: var(--accent-dark); }
-    .btn-outline {
-      background: transparent;
-      border-color: rgba(255,255,255,0.6);
-      color: #FFFFFF;
-    }
-    .btn-outline:hover { background: rgba(255,255,255,0.12); }
+        .logo {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.02em;
+            color: #FFFFFF;
+        }
 
-    /* Status card - signature element */
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 999px;
-      padding: 10px 18px;
-      width: fit-content;
-    }
-    .dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(255,199,44,0.25);
-      flex-shrink: 0;
-    }
-    .dot.closed {
-      background: #E5534B;
-      box-shadow: 0 0 0 4px rgba(229,83,75,0.25);
-    }
-    .status-label {
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 500;
-      font-size: 1rem;
-      color: #FFFFFF;
-    }
+        .logo span {
+            color: var(--accent);
+        }
 
-    /* Section shell */
-    section { padding: 56px 24px; }
-    .section-head {
-      text-align: center;
-      max-width: 620px;
-      margin: 0 auto 40px;
-    }
-    .section-head .eyebrow { text-align: center; }
-    .section-head h2 { font-size: 2rem; margin-bottom: 10px; }
-    .section-head p { color: var(--ink-soft); }
+        nav a {
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: #E7F5E2;
+            margin-left: 28px;
+        }
 
-    /* Services */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-    }
-    .service-card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 24px;
-      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    }
-    .service-card:hover {
-      background: var(--white);
-      box-shadow: 0 10px 26px rgba(0,0,0,0.1);
-      transform: translateY(-2px);
-    }
-    .service-card .icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      background: var(--white);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 14px;
-      font-size: 1.2rem;
-      transition: background 0.2s ease;
-    }
-    .service-card:hover .icon {
-      background: var(--panel);
-    }
-    .service-card h3 { font-size: 1.05rem; margin-bottom: 6px; }
-    .service-card p { font-size: 0.9rem; color: var(--ink-soft); margin: 0; }
+        nav a:hover {
+            color: var(--accent);
+        }
 
-    /* About */
-    .about {
-      background: var(--panel);
-      border-radius: 20px;
-      margin: 0 24px;
-      padding: 48px;
-      display: grid;
-      grid-template-columns: 0.8fr 1fr 0.9fr;
-      gap: 36px;
-      align-items: center;
-    }
-    .about-illustration {
-      width: 100%;
-      height: auto;
-    }
-    .about h2 { font-size: 1.8rem; margin-bottom: 14px; }
-    .about p { color: var(--ink-soft); }
-    .about-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .stat { }
-    .stat .num {
-      font-family: 'Fraunces', serif;
-      font-size: 2rem;
-      font-weight: 600;
-      color: var(--primary-dark);
-      display: block;
-    }
-    .stat .label {
-      font-size: 0.85rem;
-      color: var(--ink-soft);
-    }
+        nav {
+            display: flex;
+            align-items: center;
+        }
 
-    /* Vision & Mission */
-    .vm-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin: 0 24px 0;
-    }
-    .vm-card {
-      background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 32px;
-    }
-    .vm-card .vm-icon {
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      background: var(--panel);
-      color: var(--primary-dark);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px;
-    }
-    .vm-card h3 {
-      font-size: 1.25rem;
-      margin-bottom: 10px;
-    }
-    .vm-card p {
-      color: var(--ink-soft);
-      margin: 0;
-    }
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            cursor: pointer;
+            padding: 4px;
+        }
 
-    /* Contact + form */
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 40px;
-    }
-    .contact-info {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-    .contact-item {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-    .contact-item .ic {
-      width: 38px; height: 38px;
-      border-radius: 10px;
-      background: var(--primary);
-      color: white;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      font-size: 1rem;
-    }
-    .contact-item .txt-label { font-size: 0.82rem; color: var(--ink-soft); }
-    .contact-item .txt-value { font-weight: 500; font-size: 1rem; }
-    .contact-item a { text-decoration: none; }
-    .contact-item a:hover { color: var(--primary-dark); }
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            background: var(--primary-dark);
+            padding: 12px 24px 18px;
+        }
 
-    form {
-      background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 28px;
-    }
-    .form-row { margin-bottom: 16px; }
-    label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--ink-soft);
-      margin-bottom: 6px;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 11px 14px;
-      border-radius: 9px;
-      border: 1px solid var(--line);
-      background: var(--bg);
-      font-family: 'Inter', sans-serif;
-      font-size: 0.95rem;
-      color: var(--ink);
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: 2px solid var(--primary);
-      outline-offset: 1px;
-    }
-    textarea { resize: vertical; min-height: 80px; }
-    .form-note {
-      font-size: 0.8rem;
-      color: var(--ink-soft);
-      margin-top: 14px;
-      line-height: 1.5;
-    }
-    .form-success {
-      display: none;
-      background: var(--panel);
-      border: 1px solid var(--primary);
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 0.9rem;
-      color: var(--primary-dark);
-      margin-bottom: 16px;
-    }
-    .form-error {
-      display: none;
-      background: #FDECEA;
-      border: 1px solid #C2483A;
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 0.9rem;
-      color: #8A2E24;
-      margin-bottom: 16px;
-    }
-    .btn[disabled] {
-      opacity: 0.65;
-      cursor: not-allowed;
-      transform: none;
-    }
+        .mobile-menu.open {
+            display: flex;
+        }
 
-    footer {
-      text-align: center;
-      padding: 32px 24px;
-      color: var(--ink-soft);
-      font-size: 0.85rem;
-      border-top: 1px solid var(--line);
-    }
+        .mobile-menu a {
+            color: #E7F5E2;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 10px 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
 
-    /* Staff login button */
-    .staff-btn {
-      margin-left: 24px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.5);
-      background: transparent;
-      color: #FFFFFF;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-    }
-    .staff-btn:hover { background: rgba(255,255,255,0.15); }
+        @media (max-width: 680px) {
+            .desktop-nav {
+                display: none;
+            }
 
-    /* Modal overlay */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(20,32,29,0.55);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 32px;
-      width: 100%;
-      max-width: 380px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    .modal-box h3 { font-size: 1.3rem; margin-bottom: 6px; }
-    .modal-box .sub { font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 20px; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
-    .modal-actions .btn { flex: 1; justify-content: center; }
-    .modal-error {
-      display: none;
-      font-size: 0.85rem;
-      color: #8A2E24;
-      background: #FDECEA;
-      border: 1px solid #C2483A;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 14px;
-    }
-    .modal-close-x {
-      float: right;
-      background: none;
-      border: none;
-      font-size: 1.3rem;
-      cursor: pointer;
-      color: var(--ink-soft);
-      line-height: 1;
-    }
+            .hamburger {
+                display: block;
+            }
+        }
 
-    /* Stock admin panel */
-    #stockPanel { display: none; }
-    #stockPanel.open { display: block; }
-    .stock-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .stock-header .disclaimer {
-      font-size: 0.78rem;
-      color: var(--ink-soft);
-      background: var(--panel);
-      border-radius: 8px;
-      padding: 8px 12px;
-      max-width: 460px;
-    }
-    .stock-add-form {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr) auto;
-      gap: 10px;
-      background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 24px;
-      align-items: end;
-    }
-    .stock-add-form .field label {
-      font-size: 0.78rem;
-      color: var(--ink-soft);
-      margin-bottom: 4px;
-      display: block;
-    }
-    .stock-table-wrap {
-      background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    table.stock-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-    table.stock-table th {
-      text-align: left;
-      background: var(--panel);
-      padding: 12px 14px;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--primary-dark);
-    }
-    table.stock-table td {
-      padding: 12px 14px;
-      border-top: 1px solid var(--line);
-      vertical-align: middle;
-    }
-    table.stock-table tr.low-stock td { background: #FDECEA; }
-    table.stock-table tr.expiring td { background: #FFF8E1; }
-    table.stock-table tr.expired td { background: #F5D7D2; }
-    .qty-controls { display: flex; align-items: center; gap: 8px; }
-    .qty-btn {
-      width: 26px; height: 26px;
-      border-radius: 6px;
-      border: 1px solid var(--line);
-      background: var(--bg);
-      cursor: pointer;
-      font-weight: 600;
-      line-height: 1;
-    }
-    .tag {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 999px;
-      margin-left: 6px;
-    }
-    .tag.low { background: #C2483A; color: white; }
-    .tag.exp { background: var(--accent); color: #2A1B04; }
-    .tag.expired { background: #8A2E24; color: white; }
-    .del-btn {
-      background: none;
-      border: none;
-      color: #C2483A;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--ink-soft);
-      font-size: 0.9rem;
-    }
-    @media (max-width: 900px) {
-      .stock-add-form { grid-template-columns: 1fr 1fr; }
-    }
+        /* Hero */
+        .hero {
+            padding: 64px 24px 72px;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 48px;
+            align-items: center;
+            background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
+            margin: 0 0 0 0;
+        }
 
-    @media (max-width: 780px) {
-      .location-bar a { white-space: normal; font-size: 0.76rem; }
-      .hero { padding-top: 40px; }
-      .about { grid-template-columns: 1fr; padding: 32px; margin: 0 16px; text-align: center; }
-      .about-illustration { max-width: 160px; margin: 0 auto; }
-      .vm-grid { grid-template-columns: 1fr; margin: 0 16px; }
-      .contact-grid { grid-template-columns: 1fr; }
-    }
+        .hero.wrap {
+            max-width: none;
+        }
 
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      .btn:hover { transform: none; }
-    }
-  </style>
+        .hero-inner {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-watermark {
+            position: absolute;
+            top: 50%;
+            right: -40px;
+            transform: translateY(-50%);
+            width: 340px;
+            height: 340px;
+            opacity: 0.10;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .eyebrow {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.1rem, 4vw, 3.1rem);
+            font-weight: 600;
+            line-height: 1.08;
+            margin-bottom: 18px;
+            color: #FFFFFF;
+        }
+
+        .hero p.lead {
+            font-size: 1.08rem;
+            color: #E7F5E2;
+            max-width: 46ch;
+            margin-bottom: 28px;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 22px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #2A1B04;
+            box-shadow: 0 4px 14px rgba(232, 163, 61, 0.35);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.6);
+            color: #FFFFFF;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Status card - signature element */
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            padding: 10px 18px;
+            width: fit-content;
+        }
+
+        .dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 0 4px rgba(255, 199, 44, 0.25);
+            flex-shrink: 0;
+        }
+
+        .dot.closed {
+            background: #E5534B;
+            box-shadow: 0 0 0 4px rgba(229, 83, 75, 0.25);
+        }
+
+        .status-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 500;
+            font-size: 1rem;
+            color: #FFFFFF;
+        }
+
+        /* Section shell */
+        section {
+            padding: 56px 24px;
+        }
+
+        .section-head {
+            text-align: center;
+            max-width: 620px;
+            margin: 0 auto 40px;
+        }
+
+        .section-head .eyebrow {
+            text-align: center;
+        }
+
+        .section-head h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .section-head p {
+            color: var(--ink-soft);
+        }
+
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .service-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .service-card:hover {
+            background: var(--white);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .service-card .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            font-size: 1.2rem;
+            transition: background 0.2s ease;
+        }
+
+        .service-card:hover .icon {
+            background: var(--panel);
+        }
+
+        .service-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+        }
+
+        .service-card p {
+            font-size: 0.9rem;
+            color: var(--ink-soft);
+            margin: 0;
+        }
+
+        /* About */
+        .about {
+            background: var(--panel);
+            border-radius: 20px;
+            margin: 0 24px;
+            padding: 48px;
+            display: grid;
+            grid-template-columns: 0.8fr 1fr 0.9fr;
+            gap: 36px;
+            align-items: center;
+        }
+
+        .about-illustration {
+            width: 100%;
+            height: auto;
+        }
+
+        .about h2 {
+            font-size: 1.8rem;
+            margin-bottom: 14px;
+        }
+
+        .about p {
+            color: var(--ink-soft);
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat {
+        }
+
+        .stat .num {
+            font-family: 'Fraunces', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            display: block;
+        }
+
+        .stat .label {
+            font-size: 0.85rem;
+            color: var(--ink-soft);
+        }
+
+        /* Vision & Mission */
+        .vm-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 0 24px 0;
+        }
+
+        .vm-card {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 32px;
+        }
+
+        .vm-card .vm-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: var(--panel);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .vm-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .vm-card p {
+            color: var(--ink-soft);
+            margin: 0;
+        }
+
+        /* Contact + form */
+        .contact-grid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .contact-card {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            padding: 18px 0;
+            border-bottom: 1px solid #ececec;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-item .ic {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .contact-item .txt-label {
+            font-size: .85rem;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+        }
+
+        .contact-item .txt-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .contact-item a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            color: var(--primary);
+        }
+
+        form {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+        }
+
+        .form-row {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink-soft);
+            margin-bottom: 6px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 9px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--ink);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 1px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-note {
+            font-size: 0.8rem;
+            color: var(--ink-soft);
+            margin-top: 14px;
+            line-height: 1.5;
+        }
+
+        .form-success {
+            display: none;
+            background: var(--panel);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+            margin-bottom: 16px;
+        }
+
+        .form-error {
+            display: none;
+            background: #FDECEA;
+            border: 1px solid #C2483A;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            color: #8A2E24;
+            margin-bottom: 16px;
+        }
+
+        .btn[disabled] {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px 24px;
+            color: var(--ink-soft);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--line);
+        }
+
+        /* Staff login button */
+        .staff-btn {
+            margin-left: 24px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: transparent;
+            color: #FFFFFF;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .staff-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Modal overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 32, 29, 0.55);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 32px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-box h3 {
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+        }
+
+        .modal-box .sub {
+            font-size: 0.85rem;
+            color: var(--ink-soft);
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .modal-error {
+            display: none;
+            font-size: 0.85rem;
+            color: #8A2E24;
+            background: #FDECEA;
+            border: 1px solid #C2483A;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+        }
+
+        .modal-close-x {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--ink-soft);
+            line-height: 1;
+        }
+
+        /* Stock admin panel */
+        #stockPanel {
+            display: none;
+        }
+
+        #stockPanel.open {
+            display: block;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stock-header .disclaimer {
+            font-size: 0.78rem;
+            color: var(--ink-soft);
+            background: var(--panel);
+            border-radius: 8px;
+            padding: 8px 12px;
+            max-width: 460px;
+        }
+
+        .stock-add-form {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr) auto;
+            gap: 10px;
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            align-items: end;
+        }
+
+        .stock-add-form .field label {
+            font-size: 0.78rem;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .stock-table-wrap {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        table.stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        table.stock-table th {
+            text-align: left;
+            background: var(--panel);
+            padding: 12px 14px;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--primary-dark);
+        }
+
+        table.stock-table td {
+            padding: 12px 14px;
+            border-top: 1px solid var(--line);
+            vertical-align: middle;
+        }
+
+        table.stock-table tr.low-stock td {
+            background: #FDECEA;
+        }
+
+        table.stock-table tr.expiring td {
+            background: #FFF8E1;
+        }
+
+        table.stock-table tr.expired td {
+            background: #F5D7D2;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            cursor: pointer;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-left: 6px;
+        }
+
+        .tag.low {
+            background: #C2483A;
+            color: white;
+        }
+
+        .tag.exp {
+            background: var(--accent);
+            color: #2A1B04;
+        }
+
+        .tag.expired {
+            background: #8A2E24;
+            color: white;
+        }
+
+        .del-btn {
+            background: none;
+            border: none;
+            color: #C2483A;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--ink-soft);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .stock-add-form {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .location-bar a {
+                white-space: normal;
+                font-size: 0.76rem;
+            }
+
+            .hero {
+                padding-top: 40px;
+            }
+
+            .about {
+                grid-template-columns: 1fr;
+                padding: 32px;
+                margin: 0 16px;
+                text-align: center;
+            }
+
+            .about-illustration {
+                max-width: 160px;
+                margin: 0 auto;
+            }
+
+            .vm-grid {
+                grid-template-columns: 1fr;
+                margin: 0 16px;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            .btn:hover {
+                transform: none;
+            }
+        }
+
+        #prescription {
+
+            background: #fff;
+
+            padding: 80px 24px;
+
+        }
+
+        #prescriptionForm {
+
+            max-width: 800px;
+
+            margin: auto;
+
+            background: white;
+
+            padding: 40px;
+
+            border-radius: 16px;
+
+            border: 1px solid var(--line);
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+
+        }
+
+        .contact-card {
+
+            background: var(--panel);
+
+            padding: 30px;
+
+            border-radius: 16px;
+
+            border: 1px solid var(--line);
+
+            max-width: 500px;
+
+            margin: auto;
+
+        }
+
+        .contact-item {
+
+            margin-bottom: 25px;
+
+            display: flex;
+
+            gap: 15px;
+
+            align-items: flex-start;
+
+        }
+
+        .contact-item:last-child {
+
+            margin-bottom: 0;
+
+        }
+    </style>
 </head>
 <body>
 
 <div class="location-bar">
-  <a href="https://www.google.com/maps/search/?api=1&query=Shop+No+2%2C+15+Gardenia+Street%2C+Luxani+Centre%2C+Kinross%2C+2270%2C+Mpumalanga" target="_blank" rel="noopener">
-    <span class="loc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M12 21s-7-7.5-7-12a7 7 0 0 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
-    <span>Shop No 2, 15 Gardenia Street, Luxani Centre, Kinross, 2270, Mpumalanga</span>
-  </a>
+    <a href="https://www.google.com/maps/search/?api=1&query=Shop+No+2%2C+15+Gardenia+Street%2C+Luxani+Centre%2C+Kinross%2C+2270%2C+Mpumalanga"
+       target="_blank" rel="noopener">
+        <span class="loc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path
+                d="M12 21s-7-7.5-7-12a7 7 0 0 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+        <span>Shop No 2, 15 Gardenia Street, Luxani Centre, Kinross, 2270, Mpumalanga</span>
+    </a>
 </div>
 
 <header>
-  <div class="header-inner wrap" style="padding-left:0;padding-right:0;">
-    <div class="logo">DONA<span>PEX</span></div>
-    <nav class="desktop-nav">
-      <a href="#services">Services</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-      <button id="staffBtn" class="staff-btn">Staff Login</button>
-    </nav>
-    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="#services">Services</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-    <button id="staffBtnMobile" class="staff-btn" style="width:100%; text-align:center;">Staff Login</button>
-  </div>
+    <div class="header-inner wrap" style="padding-left:0;padding-right:0;">
+        <div class="logo">DONA<span>PEX</span></div>
+        <nav class="desktop-nav">
+            <a href="#services">Services</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <a href="staff.html" class="staff-btn" style="text-decoration:none; display:inline-block;">Staff Login</a>
+        </nav>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 width="24" height="24">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#services">Services</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="staff.html" class="staff-btn"
+           style="width:100%; text-align:center; text-decoration:none; display:block; box-sizing:border-box;">Staff
+            Login</a>
+    </div>
 </header>
 
 <section class="hero">
-  <svg class="hero-watermark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="100" cy="100" r="95" stroke="white" stroke-width="4"/>
-    <path d="M100 55v90M55 100h90" stroke="white" stroke-width="14" stroke-linecap="round"/>
-    <ellipse cx="100" cy="145" rx="30" ry="10" fill="white"/>
-  </svg>
-  <div class="hero-inner">
-    <div class="status-badge">
-      <span class="dot" id="statusDot"></span>
-      <span class="status-label" id="statusLabel">Checking hours…</span>
+    <svg class="hero-watermark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="95" stroke="white" stroke-width="4"/>
+        <path d="M100 55v90M55 100h90" stroke="white" stroke-width="14" stroke-linecap="round"/>
+        <ellipse cx="100" cy="145" rx="30" ry="10" fill="white"/>
+    </svg>
+    <div class="hero-inner">
+        <div class="status-badge">
+            <span class="dot" id="statusDot"></span>
+            <span class="status-label" id="statusLabel">Checking hours…</span>
+        </div>
+        <div>
+            <span class="eyebrow">Community Pharmacy</span>
+            <h1>Trusted care, right in your neighbourhood.</h1>
+            <p class="lead">DONAPEX is here for your everyday health needs — prescriptions, advice, and a team that
+                knows you by name.</p>
+            <div class="hero-ctas">
+                <a href="#prescription" class="btn btn-primary">Order Medicine</a>
+                <a href="tel:017 518 0188" class="btn btn-outline">Call now</a>
+                <a href="https://wa.me/27715737749" class="btn btn-outline" target="_blank">
+                    WhatsApp Us
+                </a>
+            </div>
+        </div>
     </div>
-    <div>
-      <span class="eyebrow">Community Pharmacy</span>
-      <h1>Trusted care, right in your neighbourhood.</h1>
-      <p class="lead">DONAPEX is here for your everyday health needs — prescriptions, advice, and a team that knows you by name.</p>
-      <div class="hero-ctas">
-        <a href="#contact" class="btn btn-primary">Request a callback</a>
-        <a href="tel:017 518 0188" class="btn btn-outline">Call now</a>
-      </div>
-    </div>
-  </div>
 </section>
 
 <section id="services">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">What we offer</span>
-      <h2>Services</h2>
-      <p>A few of the ways we help keep our community healthy.</p>
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">What we offer</span>
+            <h2>Services</h2>
+            <p>A few of the ways we help keep our community healthy.</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7z"/>
+                        <path d="m8.5 8.5 7 7"/>
+                    </svg>
+                </div>
+                <h3>Prescription dispensing</h3>
+                <p>Fast, accurate filling of new and repeat prescriptions.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+                        <path d="M3 21v-5h5"/>
+                    </svg>
+                </div>
+                <h3>Chronic medication refills</h3>
+                <p>Ongoing management for chronic conditions, with reminders.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <path d="m18 2 4 4"/>
+                        <path d="m17 7 3-3"/>
+                        <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/>
+                        <path d="m9 11 4 4"/>
+                        <path d="m5 19-2 2"/>
+                        <path d="m14 4 6 6"/>
+                    </svg>
+                </div>
+                <h3>Vaccinations</h3>
+                <p>Flu shots and other common vaccinations, no appointment needed.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                </div>
+                <h3>Health screenings</h3>
+                <p>Blood pressure, glucose, and general wellness checks.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                </div>
+                <h3>Pharmacist advice</h3>
+                <p>One-on-one guidance on medicines, dosage, and interactions.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <path d="M19 17h2v-4.5a2.5 2.5 0 0 0-2.5-2.5h-2.086a1 1 0 0 1-.707-.293L14 8h-4L8.293 9.707A1 1 0 0 1 7.586 10H5.5A2.5 2.5 0 0 0 3 12.5V17h2"/>
+                        <circle cx="7" cy="17" r="2"/>
+                        <circle cx="17" cy="17" r="2"/>
+                        <path d="M9 17h6"/>
+                    </svg>
+                </div>
+                <h3>Delivery for those who can't travel</h3>
+                <p>Home delivery support for elderly and housebound patients.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <rect x="3" y="11" width="18" height="8" rx="2"/>
+                        <path d="M7 11V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3"/>
+                        <line x1="7" y1="15" x2="7.01" y2="15"/>
+                        <line x1="12" y1="15" x2="12.01" y2="15"/>
+                        <line x1="17" y1="15" x2="17.01" y2="15"/>
+                    </svg>
+                </div>
+                <h3>Over-the-counter medication</h3>
+                <p>Everyday essentials — pain relief, cold and flu, vitamins, and more — no prescription needed.</p>
+            </div>
+        </div>
     </div>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7z"/><path d="m8.5 8.5 7 7"/></svg></div>
-        <h3>Prescription dispensing</h3>
-        <p>Fast, accurate filling of new and repeat prescriptions.</p>
-      </div>
-      <div class="service-card">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></div>
-        <h3>Chronic medication refills</h3>
-        <p>Ongoing management for chronic conditions, with reminders.</p>
-      </div>
-      <div class="service-card">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-2 2"/><path d="m14 4 6 6"/></svg></div>
-        <h3>Vaccinations</h3>
-        <p>Flu shots and other common vaccinations, no appointment needed.</p>
-      </div>
-      <div class="service-card">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-        <h3>Health screenings</h3>
-        <p>Blood pressure, glucose, and general wellness checks.</p>
-      </div>
-      <div class="service-card">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-        <h3>Pharmacist advice</h3>
-        <p>One-on-one guidance on medicines, dosage, and interactions.</p>
-      </div>
-      <div class="service-card">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M19 17h2v-4.5a2.5 2.5 0 0 0-2.5-2.5h-2.086a1 1 0 0 1-.707-.293L14 8h-4L8.293 9.707A1 1 0 0 1 7.586 10H5.5A2.5 2.5 0 0 0 3 12.5V17h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></svg></div>
-        <h3>Delivery for those who can't travel</h3>
-        <p>Home delivery support for elderly and housebound patients.</p>
-      </div>
-      <div class="service-card">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M7 11V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3"/><line x1="7" y1="15" x2="7.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="17" y1="15" x2="17.01" y2="15"/></svg></div>
-        <h3>Over-the-counter medication</h3>
-        <p>Everyday essentials — pain relief, cold and flu, vitamins, and more — no prescription needed.</p>
-      </div>
-    </div>
-  </div>
 </section>
 
 <section id="about">
-  <div class="about">
-    <svg class="about-illustration" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
-      <!-- simple flat pharmacist illustration -->
-      <ellipse cx="100" cy="205" rx="70" ry="10" fill="#00833E" opacity="0.12"/>
-      <rect x="60" y="70" width="80" height="110" rx="18" fill="#FFFFFF"/>
-      <circle cx="100" cy="48" r="34" fill="#F4C99B"/>
-      <path d="M66 48a34 34 0 0168 0v6H66z" fill="#3A2A20"/>
-      <rect x="82" y="95" width="36" height="46" rx="8" fill="#00833E"/>
-      <rect x="94" y="100" width="12" height="36" rx="3" fill="#FFC72C"/>
-      <circle cx="70" cy="112" r="9" fill="#F4C99B"/>
-      <circle cx="130" cy="112" r="9" fill="#F4C99B"/>
-      <rect x="72" y="150" width="56" height="10" rx="5" fill="#00833E" opacity="0.5"/>
-      <circle cx="100" cy="45" r="3" fill="#3A2A20"/>
-    </svg>
-    <div>
-      <span class="eyebrow">Who we are</span>
-      <h2>Care that knows your name.</h2>
-      <p>DONAPEX is an independent, community-focused pharmacy. We believe healthcare should feel personal — so whether you're picking up a monthly prescription or just need advice, our team takes the time to actually help.</p>
+    <div class="about">
+        <svg class="about-illustration" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+            <!-- simple flat pharmacist illustration -->
+            <ellipse cx="100" cy="205" rx="70" ry="10" fill="#00833E" opacity="0.12"/>
+            <rect x="60" y="70" width="80" height="110" rx="18" fill="#FFFFFF"/>
+            <circle cx="100" cy="48" r="34" fill="#F4C99B"/>
+            <path d="M66 48a34 34 0 0168 0v6H66z" fill="#3A2A20"/>
+            <rect x="82" y="95" width="36" height="46" rx="8" fill="#00833E"/>
+            <rect x="94" y="100" width="12" height="36" rx="3" fill="#FFC72C"/>
+            <circle cx="70" cy="112" r="9" fill="#F4C99B"/>
+            <circle cx="130" cy="112" r="9" fill="#F4C99B"/>
+            <rect x="72" y="150" width="56" height="10" rx="5" fill="#00833E" opacity="0.5"/>
+            <circle cx="100" cy="45" r="3" fill="#3A2A20"/>
+        </svg>
+        <div>
+            <span class="eyebrow">Who we are</span>
+            <h2>Care that knows your name.</h2>
+            <p>DONAPEX is an independent, community-focused pharmacy. We believe healthcare should feel personal — so
+                whether you're picking up a monthly prescription or just need advice, our team takes the time to
+                actually help.</p>
+        </div>
+        <div class="about-stats">
+            <div class="stat"><span class="num">9–6</span><span class="label">Open daily</span></div>
+            <div class="stat"><span class="num">1:1</span><span class="label">Pharmacist advice</span></div>
+            <div class="stat"><span class="num">Local</span><span class="label">Independently run</span></div>
+            <div class="stat"><span class="num">Home</span><span class="label">Delivery support</span></div>
+        </div>
     </div>
-    <div class="about-stats">
-      <div class="stat"><span class="num">9–5</span><span class="label">Open daily</span></div>
-      <div class="stat"><span class="num">1:1</span><span class="label">Pharmacist advice</span></div>
-      <div class="stat"><span class="num">Local</span><span class="label">Independently run</span></div>
-      <div class="stat"><span class="num">Home</span><span class="label">Delivery support</span></div>
-    </div>
-  </div>
 </section>
 
 <section id="vision-mission" style="padding-top: 0;">
-  <div class="vm-grid">
-    <div class="vm-card">
-      <div class="vm-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-      </div>
-      <h3>Our Vision</h3>
-      <p>To inspire healthier lives through trusted pharmaceutical care.</p>
+    <div class="vm-grid">
+        <div class="vm-card">
+            <div class="vm-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round" width="22" height="22">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </div>
+            <h3>Our Vision</h3>
+            <p>To inspire healthier lives through trusted pharmaceutical care.</p>
+        </div>
+        <div class="vm-card">
+            <div class="vm-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round" width="22" height="22">
+                    <path d="M12 2 2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+            <h3>Our Mission</h3>
+            <p>To deliver accessible, compassionate, and innovative healthcare that puts every patient first.</p>
+        </div>
     </div>
-    <div class="vm-card">
-      <div class="vm-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      </div>
-      <h3>Our Mission</h3>
-      <p>To deliver accessible, compassionate, and innovative healthcare that puts every patient first.</p>
-    </div>
-  </div>
 </section>
 
 <section id="contact">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Get in touch</span>
-      <h2>Contact & hours</h2>
-      <p>Reach us directly, or leave your details and we'll call you back.</p>
-    </div>
-    <div class="contact-grid">
-      <div class="contact-info">
-        <div class="contact-item">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 21s-7-7.5-7-12a7 7 0 0 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
-          <div>
-            <div class="txt-label">Address</div>
-            <div class="txt-value">Shop No 2 - 15 Gardenia Street<br>Luxani Centre - Kinross - 2270<br>Mpumalanga</div>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-          <div>
-            <div class="txt-label">Phone</div>
-            <a class="txt-value" href="tel:0175180188">017 518 0188</a>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></div>
-          <div>
-            <div class="txt-label">Email</div>
-            <a class="txt-value" href="mailto:info@donapex.co.za">Info@donapex.co.za</a>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-          <div>
-            <div class="txt-label">Hours</div>
-            <div class="txt-value">Mon-Fri - 9:00 AM – 6:00 PM</div>
-            <div class="txt-value">Sat - 9:00AM - 5:00 PM</div>
-            <div class="txt-value">Sun - Closed</div>
-          </div>
-        </div>
-      </div>
+    <div class="wrap">
 
-      <form id="callbackForm">
-        <div class="form-success" id="formSuccess">Thanks — we've noted your request and will call you back as soon as we can.</div>
-        <div class="form-error" id="formError">Something went wrong sending your request. Please call us directly at 017 518 0188.</div>
-        <div class="form-row">
-          <label for="name">Your name</label>
-          <input type="text" id="name" name="name" required placeholder="e.g. Cliven Jacky Hlongo">
+        <div class="section-head">
+            <span class="eyebrow">Contact Us</span>
+            <h2>Visit or Contact DONAPEX Pharmacy</h2>
+            <p>We're here to help with all your healthcare needs.</p>
         </div>
-        <div class="form-row">
-          <label for="phone">Phone number</label>
-          <input type="tel" id="phone" name="phone" required placeholder="e.g. 082 123 4567">
+
+        <div class="contact-grid">
+
+            <div class="contact-card">
+
+                <!-- Address -->
+                <div class="contact-item">
+                    <div class="ic">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" width="20" height="20">
+                            <path d="M12 21s-7-7.5-7-12a7 7 0 0 1 14 0c0 4.5-7 12-7 12z"/>
+                            <circle cx="12" cy="9" r="2.5"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <div class="txt-label">Address</div>
+                        <div class="txt-value">
+                            Shop No 2 - 15 Gardens Street<br>
+                            Luxavi Centre - Kinross - 2270<br>
+                            Mpumalanga
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="contact-item">
+                    <div class="ic">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" width="20" height="20">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2
+                       19.79 19.79 0 0 1-8.63-3.07
+                       19.5 19.5 0 0 1-6-6
+                       19.79 19.79 0 0 1-3.07-8.67
+                       A2 2 0 0 1 4.11 2h3
+                       a2 2 0 0 1 2 1.72
+                       c.127.96.361 1.903.7 2.81
+                       a2 2 0 0 1-.45 2.11
+                       L8.09 9.91a16 16 0 0 0 6 6
+                       l1.27-1.27
+                       a2 2 0 0 1 2.11-.45
+                       c.907.339 1.85.573 2.81.7
+                       A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <div class="txt-label">Phone</div>
+                        <div class="txt-value">
+                            <a href="tel:0175180188">017 518 0188</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="contact-item">
+                    <div class="ic">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" width="20" height="20">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="M22 6l-10 7L2 6"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <div class="txt-label">Email</div>
+                        <div class="txt-value">
+                            <a href="mailto:jackymashimbhy@gmail.com">
+                                Info@donapex.co.za
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Hours -->
+                <div class="contact-item">
+                    <div class="ic">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round" width="20" height="20">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <div class="txt-label">Business Hours</div>
+                        <div class="txt-value">
+                            Monday – Friday: 09:00 AM – 06:00 PM<br><br>
+                            Saturday: 09:00 AM – 05:00 PM<br><br>
+                            Sunday: Closed
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
-        <div class="form-row">
-          <label for="reason">What's this about?</label>
-          <select id="reason" name="reason">
-            <option value="" disabled selected>Select</option>
-            <option>Prescription refill</option>
-            <option>New prescription</option>
-            <option>Delivery request</option>
-            <option>General question</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label for="notes">Anything else we should know?</label>
-          <textarea id="notes" name="notes" placeholder="Optional — e.g. medication name, best time to call"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary" id="submitBtn" style="width:100%; justify-content:center;">Request callback</button>
-        <p class="form-note">This form sends a callback request only — it doesn't place a medicine order. A pharmacist will call to confirm and, if needed, arrange collection or delivery in line with pharmacy regulations.</p>
-      </form>
+
     </div>
-  </div>
 </section>
 
-<!-- Staff login modal -->
-<div class="modal-overlay" id="loginModal">
-  <div class="modal-box">
-    <button class="modal-close-x" id="closeLoginModal">&times;</button>
-    <h3>Staff Login</h3>
-    <p class="sub">Enter the staff password to manage stock.</p>
-    <div class="modal-error" id="loginError">Incorrect password. Please try again.</div>
-    <div class="form-row">
-      <label for="staffPassword">Password</label>
-      <input type="password" id="staffPassword" placeholder="Staff password">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" id="cancelLogin" style="border-color: var(--line); color: var(--ink);">Cancel</button>
-      <button class="btn btn-primary" id="submitLogin">Log in</button>
-    </div>
-  </div>
-</div>
+<section id="prescription">
 
-<!-- Stock management panel (staff only) -->
-<section id="stockPanel">
-  <div class="wrap">
-    <div class="stock-header">
-      <div>
-        <span class="eyebrow">Staff Only</span>
-        <h2>Stock Manager</h2>
-      </div>
-      <button class="btn btn-outline" id="logoutBtn" style="border-color: var(--primary); color: var(--primary-dark);">Log out</button>
-    </div>
-    <p class="stock-header disclaimer">Note: stock data is shared and synced across any computer or phone that logs in — it's meant as a simple internal tracker, not a secure medical records system.</p>
-    <div class="modal-error" id="stockLoadError" style="display:none; margin-bottom:16px;">Couldn't reach the stock database. Check your internet connection and try logging out and back in.</div>
+    <div class="wrap">
 
-    <form class="stock-add-form" id="addStockForm">
-      <div class="field" style="grid-column: 1 / -1;">
-        <div class="modal-error" id="addStockError" style="display:none;"></div>
-      </div>
-      <div class="field">
-        <label for="itemName">Item name</label>
-        <input type="text" id="itemName" placeholder="e.g. Panado 500mg">
-      </div>
-      <div class="field">
-        <label for="itemQty">Quantity</label>
-        <input type="number" id="itemQty" min="0" placeholder="0">
-      </div>
-      <div class="field">
-        <label for="itemThreshold">Low-stock alert below</label>
-        <input type="number" id="itemThreshold" min="0" placeholder="10">
-      </div>
-      <div class="field">
-        <label for="itemExpiry">Expiry date</label>
-        <input type="date" id="itemExpiry">
-      </div>
-      <div class="field">
-        <label for="itemCategory">Category</label>
-        <input type="text" id="itemCategory" placeholder="e.g. Pain relief">
-      </div>
-      <button type="submit" class="btn btn-primary">Add item</button>
-    </form>
+        <div class="section-head">
+            <span class="eyebrow">Online Orders</span>
 
-    <div class="stock-table-wrap">
-      <table class="stock-table" id="stockTable">
-        <thead>
-        <tr>
-          <th>Item</th>
-          <th>Category</th>
-          <th>Quantity</th>
-          <th>Expiry</th>
-          <th></th>
-        </tr>
-        </thead>
-        <tbody id="stockTableBody"></tbody>
-      </table>
-      <div class="empty-state" id="stockEmptyState" style="display:none;">No stock items yet — add your first one above.</div>
+            <h2>Order Your Prescription Online</h2>
+
+            <p>
+                Upload your prescription, tell us what medication you need,
+                and choose whether you would like to collect it in-store
+                or have it delivered.
+            </p>
+
+        </div>
+
+        <form id="prescriptionForm" enctype="multipart/form-data">
+            <label>Order Type</label>
+
+            <select id="orderType" name="orderType" required>
+                <option value="">Select</option>
+                <option value="Prescription">Prescription Medicine</option>
+                <option value="OTC">Over-the-counter (No Prescription)</option>
+            </select>
+
+            <div class="form-row">
+                <label>Full Name</label>
+                <input type="text" id="name" name="name" required placeholder="e.g. Jacky Hlongo">
+            </div>
+
+            <div class="form-row">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" name="phone" required placeholder="e.g. 082 123 4567">
+            </div>
+
+            <div class="form-row">
+                <label>Email Address</label>
+                <input type="email" name="email">
+            </div>
+
+            <div class="form-row">
+                <label>Medicine(s) Required</label>
+
+                <textarea
+                        name="medicine"
+                        rows="4"
+                        placeholder="Example:
+
+Panado
+Amoxicillin"
+                        required></textarea>
+
+            </div>
+
+            <div class="form-row" id="uploadSection">
+
+                <label>Upload Prescription</label>
+
+                <input
+                        type="file"
+                        id="prescriptionFile"
+                        name="prescription"
+                        accept=".pdf,.jpg,.jpeg,.png">
+            </div>
+
+            <div class="form-row">
+
+                <label>Collection Method</label>
+
+                <select id="collectionMethod" name="collection">
+
+                    <option value="">Select</option>
+
+                    <option value="Collection">
+                        Collect In Store
+                    </option>
+
+                    <option value="Delivery">
+                        Home Delivery
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div
+                    class="form-row"
+                    id="deliveryAddress"
+                    style="display:none;">
+
+                <label>Delivery Address</label>
+
+                <textarea
+                        name="address"
+                        rows="3"></textarea>
+
+            </div>
+
+            <div class="form-row">
+
+                <label>Additional Notes</label>
+
+                <textarea
+                        name="notes"
+                        rows="4"></textarea>
+
+            </div>
+
+            <div id="formSuccess" class="form-success">
+                ✅ Prescription submitted successfully.
+                We will contact you shortly.
+            </div>
+
+            <div id="formError" class="form-error">
+                ❌ Something went wrong.
+                Please try again.
+            </div>
+
+            <button
+                    id="submitBtn"
+                    type="submit"
+                    class="btn btn-primary"
+                    style="width:100%;justify-content:center;">
+
+                Submit Order
+
+            </button>
+
+        </form>
+
     </div>
-  </div>
+
 </section>
 
 <footer>
-  © <span id="year"></span> DONAPEX Pharmacy. Mon–Sat, 9:00 AM – 5:00 PM.
+    © <span id="year"></span> DONAPEX Pharmacy. Mon–Fri, 9:00 AM – 6:00 PM | Sat, 9:00 AM - 5:00 PM | Sun, Closed.
 </footer>
 
 <script>
-  document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-  // Live open/closed status — reads visitor's local time
-  function updateStatus() {
-    const now = new Date();
-    const day = now.getDay(); // 0 Sun - 6 Sat
-    const hour = now.getHours();
-    const openHour = 9, closeHour = 17;
-    const isSunday = day === 0;
-    const withinHours = hour >= openHour && hour < closeHour;
-    const isOpen = !isSunday && withinHours;
+    // Live open/closed status — reads visitor's local time
+    function updateStatus() {
+        const now = new Date();
+        const day = now.getDay(); // 0 Sun - 6 Sat
+        const hour = now.getHours();
+        const openHour = 9, closeHour = 18;
+        const isSunday = day === 0;
+        const withinHours = hour >= openHour && hour < closeHour;
+        const isOpen = !isSunday && withinHours;
 
-    const dot = document.getElementById('statusDot');
-    const label = document.getElementById('statusLabel');
+        const dot = document.getElementById('statusDot');
+        const label = document.getElementById('statusLabel');
 
-    if (isOpen) {
-      dot.classList.remove('closed');
-      label.textContent = 'Open now · closes 5:00 PM';
-    } else {
-      dot.classList.add('closed');
-      label.textContent = 'Closed · opens 9:00 AM';
-    }
-  }
-  updateStatus();
-  setInterval(updateStatus, 60000);
-
-  // ---------- Mobile nav ----------
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const mobileMenu = document.getElementById('mobileMenu');
-  hamburgerBtn.addEventListener('click', () => {
-    mobileMenu.classList.toggle('open');
-  });
-  // Close mobile menu when a nav link is tapped
-  mobileMenu.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => mobileMenu.classList.remove('open'));
-  });
-
-  // ---------- Staff login + Stock Manager ----------
-  const STAFF_PASSWORD = 'donapex2026';
-  let isStaffLoggedIn = false;
-  let stockItems = [];
-
-  const loginModal = document.getElementById('loginModal');
-  const staffBtn = document.getElementById('staffBtn');
-  const staffBtnMobile = document.getElementById('staffBtnMobile');
-  const closeLoginModal = document.getElementById('closeLoginModal');
-  const cancelLogin = document.getElementById('cancelLogin');
-  const submitLogin = document.getElementById('submitLogin');
-  const staffPasswordInput = document.getElementById('staffPassword');
-  const loginError = document.getElementById('loginError');
-  const stockPanel = document.getElementById('stockPanel');
-  const logoutBtn = document.getElementById('logoutBtn');
-
-  function handleStaffBtnClick() {
-    if (isStaffLoggedIn) {
-      mobileMenu.classList.remove('open');
-      stockPanel.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    mobileMenu.classList.remove('open');
-    loginModal.classList.add('open');
-    staffPasswordInput.value = '';
-    loginError.style.display = 'none';
-    staffPasswordInput.focus();
-  }
-  staffBtn.addEventListener('click', handleStaffBtnClick);
-  staffBtnMobile.addEventListener('click', handleStaffBtnClick);
-
-  function closeModal() {
-    loginModal.classList.remove('open');
-  }
-  closeLoginModal.addEventListener('click', closeModal);
-  cancelLogin.addEventListener('click', closeModal);
-
-  submitLogin.addEventListener('click', handleLogin);
-  staffPasswordInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleLogin();
-  });
-
-  function handleLogin() {
-    if (staffPasswordInput.value === STAFF_PASSWORD) {
-      isStaffLoggedIn = true;
-      closeModal();
-      staffBtn.textContent = 'Stock Manager';
-      staffBtnMobile.textContent = 'Stock Manager';
-      stockPanel.classList.add('open');
-      loadStock();
-      stockPanel.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      loginError.style.display = 'block';
-    }
-  }
-
-  logoutBtn.addEventListener('click', () => {
-    isStaffLoggedIn = false;
-    staffBtn.textContent = 'Staff Login';
-    staffBtnMobile.textContent = 'Staff Login';
-    stockPanel.classList.remove('open');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
-  const FIREBASE_DB_URL = 'https://donapex-pharmacy-default-rtdb.europe-west1.firebasedatabase.app';
-
-  async function loadStock() {
-    const errorBox = document.getElementById('stockLoadError');
-    errorBox.style.display = 'none';
-    const emptyState = document.getElementById('stockEmptyState');
-    emptyState.textContent = 'Loading stock…';
-    emptyState.style.display = 'block';
-    try {
-      const response = await fetch(`${FIREBASE_DB_URL}/stock.json`);
-      if (!response.ok) throw new Error('Bad response: ' + response.status);
-      const data = await response.json();
-      stockItems = Array.isArray(data) ? data.filter(Boolean) : (data ? Object.values(data) : []);
-    } catch (err) {
-      console.error('Failed to load stock from Firebase', err);
-      stockItems = [];
-      errorBox.style.display = 'block';
-    }
-    emptyState.textContent = 'No stock items yet — add your first one above.';
-    renderStock();
-  }
-
-  async function saveStock() {
-    const errorBox = document.getElementById('stockLoadError');
-    try {
-      const response = await fetch(`${FIREBASE_DB_URL}/stock.json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(stockItems)
-      });
-      if (!response.ok) throw new Error('Bad response: ' + response.status);
-      errorBox.style.display = 'none';
-    } catch (err) {
-      console.error('Failed to save stock to Firebase', err);
-      errorBox.textContent = "Couldn't save that change to the stock database. Check your internet connection.";
-      errorBox.style.display = 'block';
-    }
-  }
-
-  function renderStock() {
-    const tbody = document.getElementById('stockTableBody');
-    const emptyState = document.getElementById('stockEmptyState');
-    tbody.innerHTML = '';
-
-    if (stockItems.length === 0) {
-      emptyState.style.display = 'block';
-      return;
-    }
-    emptyState.style.display = 'none';
-
-    // Compare by calendar date only (midnight), so "today" never counts as expired
-    const now = new Date();
-    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const soon = new Date(todayMidnight);
-    soon.setDate(todayMidnight.getDate() + 30);
-
-    stockItems.forEach((item, idx) => {
-      const isLow = item.threshold != null && item.qty <= item.threshold;
-
-      let isExpired = false;
-      let isExpiring = false;
-      if (item.expiry) {
-        const [y, m, d] = item.expiry.split('-').map(Number);
-        const expiryDate = new Date(y, m - 1, d);
-        if (expiryDate < todayMidnight) {
-          isExpired = true;
-        } else if (expiryDate <= soon) {
-          isExpiring = true;
+        if (isOpen) {
+            dot.classList.remove('closed');
+            label.textContent = 'Open now · closes 6:00 PM';
+        } else {
+            dot.classList.add('closed');
+            label.textContent = 'Closed · opens 9:00 AM';
         }
-      }
+    }
 
-      const row = document.createElement('tr');
-      if (isExpired) row.classList.add('expired');
-      else if (isLow) row.classList.add('low-stock');
-      else if (isExpiring) row.classList.add('expiring');
+    updateStatus();
+    setInterval(updateStatus, 60000);
 
-      row.innerHTML = `
+    // ---------- Mobile nav ----------
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+    });
+    // Close mobile menu when a nav link is tapped
+    mobileMenu.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    });
+
+    // ---------- Staff login + Stock Manager ----------
+    let isStaffLoggedIn = false;
+    let stockItems = [];
+
+    const loginModal = document.getElementById('loginModal');
+    const staffBtn = document.getElementById('staffBtn');
+    const staffBtnMobile = document.getElementById('staffBtnMobile');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    const cancelLogin = document.getElementById('cancelLogin');
+    const submitLogin = document.getElementById('submitLogin');
+    const staffPasswordInput = document.getElementById('staffPassword');
+    const loginError = document.getElementById('loginError');
+    const stockPanel = document.getElementById('stockPanel');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const tabStockBtn = document.getElementById('tabStockBtn');
+    const tabOrdersBtn = document.getElementById('tabOrdersBtn');
+    const stockView = document.getElementById('stockView');
+    const ordersView = document.getElementById('ordersView');
+
+    tabStockBtn.addEventListener('click', () => {
+        stockView.style.display = 'block';
+        ordersView.style.display = 'none';
+        tabStockBtn.style.borderColor = 'var(--primary)';
+        tabStockBtn.style.color = 'var(--primary-dark)';
+        tabOrdersBtn.style.borderColor = 'var(--line)';
+        tabOrdersBtn.style.color = 'var(--ink)';
+    });
+
+    tabOrdersBtn.addEventListener('click', () => {
+        stockView.style.display = 'none';
+        ordersView.style.display = 'block';
+        tabOrdersBtn.style.borderColor = 'var(--primary)';
+        tabOrdersBtn.style.color = 'var(--primary-dark)';
+        tabStockBtn.style.borderColor = 'var(--line)';
+        tabStockBtn.style.color = 'var(--ink)';
+        loadOrders();
+    });
+
+    function handleStaffBtnClick() {
+        if (isStaffLoggedIn) {
+            mobileMenu.classList.remove('open');
+            stockPanel.scrollIntoView({behavior: 'smooth'});
+            return;
+        }
+        mobileMenu.classList.remove('open');
+        loginModal.classList.add('open');
+        staffPasswordInput.value = '';
+        loginError.style.display = 'none';
+        staffPasswordInput.focus();
+    }
+
+    staffBtn.addEventListener('click', handleStaffBtnClick);
+    staffBtnMobile.addEventListener('click', handleStaffBtnClick);
+
+    function closeModal() {
+        loginModal.classList.remove('open');
+    }
+
+    closeLoginModal.addEventListener('click', closeModal);
+    cancelLogin.addEventListener('click', closeModal);
+
+    submitLogin.addEventListener('click', handleLogin);
+    staffPasswordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+
+    function handleLogin() {
+        if (staffPasswordInput.value === STAFF_PASSWORD) {
+            isStaffLoggedIn = true;
+            closeModal();
+            staffBtn.textContent = 'Stock Manager';
+            staffBtnMobile.textContent = 'Stock Manager';
+            stockPanel.classList.add('open');
+            loadStock();
+            stockPanel.scrollIntoView({behavior: 'smooth'});
+        } else {
+            loginError.style.display = 'block';
+        }
+    }
+
+    logoutBtn.addEventListener('click', () => {
+        isStaffLoggedIn = false;
+        staffBtn.textContent = 'Staff Login';
+        staffBtnMobile.textContent = 'Staff Login';
+        stockPanel.classList.remove('open');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+
+    const FIREBASE_DB_URL = 'https://donapex-pharmacy-default-rtdb.europe-west1.firebasedatabase.app';
+
+    async function loadStock() {
+        const errorBox = document.getElementById('stockLoadError');
+        errorBox.style.display = 'none';
+        const emptyState = document.getElementById('stockEmptyState');
+        emptyState.textContent = 'Loading stock…';
+        emptyState.style.display = 'block';
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/stock.json`);
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            const data = await response.json();
+            stockItems = Array.isArray(data) ? data.filter(Boolean) : (data ? Object.values(data) : []);
+        } catch (err) {
+            console.error('Failed to load stock from Firebase', err);
+            stockItems = [];
+            errorBox.style.display = 'block';
+        }
+        emptyState.textContent = 'No stock items yet — add your first one above.';
+        renderStock();
+    }
+
+    async function saveStock() {
+        const errorBox = document.getElementById('stockLoadError');
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/stock.json`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(stockItems)
+            });
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            errorBox.style.display = 'none';
+        } catch (err) {
+            console.error('Failed to save stock to Firebase', err);
+            errorBox.textContent = "Couldn't save that change to the stock database. Check your internet connection.";
+            errorBox.style.display = 'block';
+        }
+    }
+
+    function renderStock() {
+        const tbody = document.getElementById('stockTableBody');
+        const emptyState = document.getElementById('stockEmptyState');
+        tbody.innerHTML = '';
+
+        if (stockItems.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        // Compare by calendar date only (midnight), so "today" never counts as expired
+        const now = new Date();
+        const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const soon = new Date(todayMidnight);
+        soon.setDate(todayMidnight.getDate() + 30);
+
+        stockItems.forEach((item, idx) => {
+            const isLow = item.threshold != null && item.qty <= item.threshold;
+
+            let isExpired = false;
+            let isExpiring = false;
+            if (item.expiry) {
+                const [y, m, d] = item.expiry.split('-').map(Number);
+                const expiryDate = new Date(y, m - 1, d);
+                if (expiryDate < todayMidnight) {
+                    isExpired = true;
+                } else if (expiryDate <= soon) {
+                    isExpiring = true;
+                }
+            }
+
+            const row = document.createElement('tr');
+            if (isExpired) row.classList.add('expired');
+            else if (isLow) row.classList.add('low-stock');
+            else if (isExpiring) row.classList.add('expiring');
+
+            row.innerHTML = `
         <td>${escapeHtml(item.name)}
           ${isExpired ? '<span class="tag expired">Expired</span>' : ''}
           ${!isExpired && isLow ? '<span class="tag low">Low stock</span>' : ''}
@@ -1129,98 +1652,245 @@
         <td>${item.expiry || '—'}</td>
         <td><button class="del-btn" data-action="del" data-idx="${idx}">Remove</button></td>
       `;
-      tbody.appendChild(row);
+            tbody.appendChild(row);
+        });
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    let ordersData = {};
+
+    async function loadOrders() {
+        const errorBox = document.getElementById('ordersLoadError');
+        errorBox.style.display = 'none';
+        const emptyState = document.getElementById('ordersEmptyState');
+        emptyState.textContent = 'Loading orders…';
+        emptyState.style.display = 'block';
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/orders.json`);
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            const data = await response.json();
+            ordersData = data || {};
+        } catch (err) {
+            console.error('Failed to load orders from Firebase', err);
+            ordersData = {};
+            errorBox.style.display = 'block';
+        }
+        emptyState.textContent = 'No orders yet.';
+        renderOrders();
+    }
+
+    function renderOrders() {
+        const tbody = document.getElementById('ordersTableBody');
+        const emptyState = document.getElementById('ordersEmptyState');
+        tbody.innerHTML = '';
+
+        const ids = Object.keys(ordersData).sort((a, b) => {
+            const ta = ordersData[a].createdAt || '';
+            const tb = ordersData[b].createdAt || '';
+            return tb.localeCompare(ta);
+        });
+
+        if (ids.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        ids.forEach(id => {
+            const o = ordersData[id];
+            const row = document.createElement('tr');
+            const placed = o.createdAt ? new Date(o.createdAt).toLocaleString() : '—';
+
+            row.innerHTML = `
+                <td>${escapeHtml(o.customerName || '—')}</td>
+                <td>${escapeHtml(o.phone || '—')}${o.email ? '<br>' + escapeHtml(o.email) : ''}</td>
+                <td>${escapeHtml(o.orderType || '—')}<br><span style="font-size:0.85em;color:var(--ink-soft);">${escapeHtml(o.medicine || '')}</span></td>
+                <td>${escapeHtml(o.collectionMethod || '—')}</td>
+                <td>
+                  <select class="order-status-select" data-id="${id}">
+                    <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="Approved" ${o.status === 'Approved' ? 'selected' : ''}>Approved</option>
+                    <option value="Ready" ${o.status === 'Ready' ? 'selected' : ''}>Ready</option>
+                    <option value="Collected" ${o.status === 'Collected' ? 'selected' : ''}>Collected</option>
+                  </select>
+                </td>
+                <td style="font-size:0.85em;">${placed}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    document.getElementById('ordersTableBody').addEventListener('change', async (e) => {
+        if (!e.target.classList.contains('order-status-select')) return;
+        const id = e.target.dataset.id;
+        const newStatus = e.target.value;
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/orders/${id}.json`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({status: newStatus})
+            });
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            ordersData[id].status = newStatus;
+        } catch (err) {
+            console.error('Failed to update order status', err);
+            const errorBox = document.getElementById('ordersLoadError');
+            errorBox.textContent = "Couldn't save that status change. Check your internet connection.";
+            errorBox.style.display = 'block';
+        }
     });
-  }
 
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+    document.getElementById('stockTableBody').addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const idx = parseInt(btn.dataset.idx, 10);
+        const action = btn.dataset.action;
 
-  document.getElementById('stockTableBody').addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const idx = parseInt(btn.dataset.idx, 10);
-    const action = btn.dataset.action;
+        if (action === 'inc') stockItems[idx].qty++;
+        if (action === 'dec') stockItems[idx].qty = Math.max(0, stockItems[idx].qty - 1);
+        if (action === 'del') stockItems.splice(idx, 1);
 
-    if (action === 'inc') stockItems[idx].qty++;
-    if (action === 'dec') stockItems[idx].qty = Math.max(0, stockItems[idx].qty - 1);
-    if (action === 'del') stockItems.splice(idx, 1);
+        renderStock();
+        saveStock();
+    });
 
-    renderStock();
-    saveStock();
-  });
+    document.getElementById('addStockForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const errorBox = document.getElementById('addStockError');
+        errorBox.style.display = 'none';
 
-  document.getElementById('addStockForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const errorBox = document.getElementById('addStockError');
-    errorBox.style.display = 'none';
+        const name = document.getElementById('itemName').value.trim();
+        const qtyRaw = document.getElementById('itemQty').value;
+        const thresholdVal = document.getElementById('itemThreshold').value;
+        const threshold = thresholdVal ? parseInt(thresholdVal, 10) : null;
+        const expiry = document.getElementById('itemExpiry').value;
+        const category = document.getElementById('itemCategory').value.trim();
 
-    const name = document.getElementById('itemName').value.trim();
-    const qtyRaw = document.getElementById('itemQty').value;
-    const thresholdVal = document.getElementById('itemThreshold').value;
-    const threshold = thresholdVal ? parseInt(thresholdVal, 10) : null;
-    const expiry = document.getElementById('itemExpiry').value;
-    const category = document.getElementById('itemCategory').value.trim();
+        if (!name) {
+            errorBox.textContent = 'Please enter an item name.';
+            errorBox.style.display = 'block';
+            return;
+        }
+        if (qtyRaw === '' || isNaN(parseInt(qtyRaw, 10))) {
+            errorBox.textContent = 'Please enter a quantity.';
+            errorBox.style.display = 'block';
+            return;
+        }
 
-    if (!name) {
-      errorBox.textContent = 'Please enter an item name.';
-      errorBox.style.display = 'block';
-      return;
+        const qty = parseInt(qtyRaw, 10);
+        stockItems.push({name, qty, threshold, expiry, category});
+        renderStock();
+        saveStock();
+        e.target.reset();
+        document.getElementById('itemName').focus();
+    });
+
+    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xdaqnedw';
+
+    const prescriptionForm = document.getElementById('prescriptionForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const successBox = document.getElementById('formSuccess');
+    const errorBox = document.getElementById('formError');
+
+    prescriptionForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        successBox.style.display = 'none';
+        errorBox.style.display = 'none';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
+
+        const formData = new FormData(prescriptionForm);
+        const order = {
+
+            customerName: formData.get("name"),
+
+            phone: formData.get("phone"),
+
+            email: formData.get("email"),
+
+            orderType: document.getElementById("orderType").value,
+
+            medicine: formData.get("medicine"),
+
+            collectionMethod: formData.get("collection"),
+
+            address: formData.get("address"),
+
+            notes: formData.get("notes"),
+
+            status: "Pending",
+
+            createdAt: new Date().toISOString()
+
+        };
+
+        try {
+            const [firebaseResponse, formspreeResponse] = await Promise.all([
+                fetch(`${FIREBASE_DB_URL}/orders.json`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(order)
+                }),
+                fetch(FORMSPREE_ENDPOINT, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {'Accept': 'application/json'}
+                })
+            ]);
+
+            if (firebaseResponse.ok) {
+                successBox.style.display = 'block';
+                prescriptionForm.reset();
+            } else {
+                errorBox.style.display = 'block';
+            }
+
+        } catch (err) {
+            errorBox.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Prescription';
+        }
+    });
+
+    const collectionMethod = document.getElementById("collectionMethod");
+    const deliveryAddress = document.getElementById("deliveryAddress");
+
+    if (collectionMethod && deliveryAddress) {
+
+        collectionMethod.addEventListener("change", function () {
+
+            deliveryAddress.style.display =
+                this.value === "Delivery"
+                    ? "block"
+                    : "none";
+
+        });
     }
-    if (qtyRaw === '' || isNaN(parseInt(qtyRaw, 10))) {
-      errorBox.textContent = 'Please enter a quantity.';
-      errorBox.style.display = 'block';
-      return;
-    }
+    const orderType = document.getElementById("orderType");
+    const uploadSection = document.getElementById("uploadSection");
+    const prescriptionFile = document.getElementById("prescriptionFile");
 
-    const qty = parseInt(qtyRaw, 10);
-    stockItems.push({ name, qty, threshold, expiry, category });
-    renderStock();
-    saveStock();
-    e.target.reset();
-    document.getElementById('itemName').focus();
-  });
-  // SETUP: create a free form at https://formspree.io (sign up with jackymashimbhy@gmail.com),
-  // then replace YOUR_FORM_ID below with the ID Formspree gives you.
-  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xdaqnedw';
+    // Hide upload section initially
+    uploadSection.style.display = "none";
 
-  const callbackForm = document.getElementById('callbackForm');
-  const submitBtn = document.getElementById('submitBtn');
-  const successBox = document.getElementById('formSuccess');
-  const errorBox = document.getElementById('formError');
+    orderType.addEventListener("change", function () {
 
-  callbackForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    successBox.style.display = 'none';
-    errorBox.style.display = 'none';
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending…';
+        if (this.value === "Prescription") {
+            uploadSection.style.display = "block";
+            prescriptionFile.required = true;
+        } else {
+            uploadSection.style.display = "none";
+            prescriptionFile.required = false;
+            prescriptionFile.value = "";
+        }
 
-    const formData = new FormData(callbackForm);
-
-    try {
-      const response = await fetch(FORMSPREE_ENDPOINT, {
-        method: 'POST',
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-      });
-
-      if (response.ok) {
-        successBox.style.display = 'block';
-        callbackForm.reset();
-      } else {
-        errorBox.style.display = 'block';
-      }
-    } catch (err) {
-      errorBox.style.display = 'block';
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Request callback';
-    }
-  });
+    });
 </script>
 
 </body>
