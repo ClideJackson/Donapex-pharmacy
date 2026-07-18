@@ -953,6 +953,138 @@
             margin-bottom: 0;
 
         }
+
+        /* Emergency Assist button */
+        .emergency-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 50;
+            background: #C2483A;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 14px 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(194, 72, 58, 0.45);
+            animation: pulse-emergency 2.2s infinite;
+        }
+
+        .emergency-fab:hover {
+            background: #A53B2F;
+        }
+
+        @keyframes pulse-emergency {
+            0% { box-shadow: 0 8px 24px rgba(194, 72, 58, 0.45); }
+            50% { box-shadow: 0 8px 30px rgba(194, 72, 58, 0.75); }
+            100% { box-shadow: 0 8px 24px rgba(194, 72, 58, 0.45); }
+        }
+
+        .emergency-modal-box .sub {
+            font-size: 0.9rem;
+            color: var(--ink-soft);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .emergency-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .emergency-actions .btn {
+            justify-content: center;
+            width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            .emergency-fab span.fab-label {
+                display: none;
+            }
+            .emergency-fab {
+                padding: 14px;
+            }
+        }
+
+        .order-ref-box {
+            background: var(--panel);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+        }
+
+        .order-ref-box strong {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+        }
+
+        #trackOrder { background: var(--panel); }
+
+        .track-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+        }
+
+        .track-results { margin-top: 20px; }
+
+        .track-order-item {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            background: var(--bg);
+        }
+
+        .track-order-item .ref {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--ink-soft);
+        }
+
+        .track-status-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-top: 6px;
+        }
+
+        .track-status-badge.Pending { background: #FFF8E1; color: #8A6D00; }
+        .track-status-badge.Approved { background: #E1F0FF; color: #0A5EA8; }
+        .track-status-badge.Ready { background: #E1F7E6; color: #0A7B33; }
+        .track-status-badge.Collected { background: var(--panel); color: var(--primary-dark); }
+
+        .payment-box {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .payment-instructions {
+            font-size: 0.88rem;
+            color: var(--ink-soft);
+            margin: 0 0 16px;
+            line-height: 1.5;
+        }
+
     </style>
 </head>
 <body>
@@ -1374,6 +1506,35 @@ Amoxicillin"
 
             </div>
 
+            <div class="form-row">
+                <label>Payment Method</label>
+                <select id="paymentMethod" name="paymentMethod" required>
+                    <option value="">Select</option>
+                    <option value="COD">Cash on Delivery / Collection</option>
+                    <option value="Link">Pay Now (opens SnapScan)</option>
+                </select>
+            </div>
+
+            <div class="form-row" id="linkPaymentSection" style="display:none;">
+                <div class="payment-box">
+                    <p class="payment-instructions">
+                        Tap below to open SnapScan and pay directly. Your order reference will be
+                        included automatically — please enter the amount your pharmacist confirms with you.
+                    </p>
+                    <a id="payNowLink" href="#" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center;">
+                        💳 Pay Now via SnapScan
+                    </a>
+                </div>
+            </div>
+
+            <div class="form-row" id="paymentProofSection" style="display:none;">
+                <label>Upload Proof of Payment</label>
+                <input type="file" id="paymentProof" name="paymentProof" accept=".pdf,.jpg,.jpeg,.png">
+                <p class="form-note" id="paymentProofNote" style="display:none; color:#8A2E24; margin-top:6px;">
+                    Please upload proof of payment to submit your order.
+                </p>
+            </div>
+
             <div
                     class="form-row"
                     id="deliveryAddress"
@@ -1398,8 +1559,16 @@ Amoxicillin"
             </div>
 
             <div id="formSuccess" class="form-success">
-                ✅ Prescription submitted successfully.
+                <div class="order-ref-box">
+                    ✅ Order submitted successfully.<br>
+                    Your reference number: <strong id="orderRefDisplay"></strong>
+                </div>
                 We will contact you shortly.
+                <div style="margin-top:12px;">
+                    <a href="#" id="whatsappConfirmBtn" target="_blank" class="btn btn-outline" style="border-color: var(--primary); color: var(--primary-dark); width:100%; justify-content:center;">
+                        💬 Send yourself a WhatsApp confirmation
+                    </a>
+                </div>
             </div>
 
             <div id="formError" class="form-error">
@@ -1423,10 +1592,59 @@ Amoxicillin"
 
 </section>
 
+<section id="trackOrder">
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">Already Ordered?</span>
+            <h2>Track My Order</h2>
+            <p>Enter the phone number you used when placing your order to check its status.</p>
+        </div>
+        <div class="track-card">
+            <div class="form-row">
+                <label for="trackPhone">Phone Number</label>
+                <input type="tel" id="trackPhone" placeholder="e.g. 082 123 4567">
+            </div>
+            <button id="trackOrderBtn" class="btn btn-primary" style="width:100%; justify-content:center;">Look Up My Orders</button>
+            <div class="modal-error" id="trackError" style="margin-top:14px;">No orders found for that phone number. Please check the number and try again.</div>
+            <div class="track-results" id="trackResults"></div>
+        </div>
+    </div>
+</section>
+
 
 <footer>
     © <span id="year"></span> DONAPEX Pharmacy. Mon–Fri, 9:00 AM – 6:00 PM | Sat, 9:00 AM - 5:00 PM | Sun, Closed.
 </footer>
+
+<!-- Emergency Assist floating button -->
+<button class="emergency-fab" id="emergencyFabBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+        <path d="M12 9v4"/><path d="M12 17h.01"/>
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+    </svg>
+    <span class="fab-label">Emergency Assist</span>
+</button>
+
+<!-- Emergency Assist modal -->
+<div class="modal-overlay" id="emergencyModal">
+    <div class="modal-box emergency-modal-box">
+        <button class="modal-close-x" id="closeEmergencyModal">&times;</button>
+        <h3>Emergency Assist</h3>
+        <p class="sub">
+            Need medication urgently, even after hours? We can help with critical needs
+            — like getting an asthma inhaler or other emergency medicine to you.
+            Call or WhatsApp us now and we'll do our best to assist as quickly as possible.
+        </p>
+        <div class="emergency-actions">
+            <a href="tel:0175180188" class="btn btn-primary">
+                📞 Call Now
+            </a>
+            <a href="https://wa.me/27715737749" target="_blank" class="btn btn-outline" style="border-color: var(--primary); color: var(--primary-dark);">
+                💬 WhatsApp Us
+            </a>
+        </div>
+    </div>
+</div>
 
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -1434,23 +1652,35 @@ Amoxicillin"
     /* Open / Closed Status */
     function updateStatus() {
         const now = new Date();
-        const day = now.getDay();
-        const hour = now.getHours();
+        const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+        const minutesNow = now.getHours() * 60 + now.getMinutes();
 
-        const isOpen =
-            day !== 0 &&
-            hour >= 9 &&
-            hour < 18;
+        const isSunday = day === 0;
+        const isSaturday = day === 6;
+
+        const openMinutes = 9 * 60; // 9:00 AM
+        const closeMinutes = isSaturday ? 17 * 60 : 18 * 60; // 5 PM Sat, 6 PM Mon-Fri
+        const closingSoonWindow = 30; // minutes before close to show "Closing soon"
+
+        const isOpen = !isSunday && minutesNow >= openMinutes && minutesNow < closeMinutes;
+        const isClosingSoon = isOpen && (closeMinutes - minutesNow) <= closingSoonWindow;
+
+        const closeLabel = isSaturday ? '5:00 PM' : '6:00 PM';
 
         const dot = document.getElementById('statusDot');
         const label = document.getElementById('statusLabel');
 
-        if (isOpen) {
+        if (isClosingSoon) {
+            dot.classList.add('closed'); // reuse red dot styling to signal urgency
+            label.textContent = `Closing soon · closes ${closeLabel}`;
+        } else if (isOpen) {
             dot.classList.remove('closed');
-            label.textContent = 'Open now · closes 6:00 PM';
+            label.textContent = `Open now · closes ${closeLabel}`;
         } else {
             dot.classList.add('closed');
-            label.textContent = 'Closed · opens 9:00 AM';
+            label.textContent = (isSaturday && minutesNow >= closeMinutes)
+                ? 'Closed · opens Monday 9:00 AM'
+                : 'Closed · opens 9:00 AM';
         }
     }
 
@@ -1513,6 +1743,12 @@ Amoxicillin"
     });
 
     /* Form Submission */
+    function generateOrderRef() {
+        const ts = Date.now().toString(36).toUpperCase().slice(-5);
+        const rand = Math.random().toString(36).toUpperCase().slice(2, 4);
+        return `DNX-${ts}${rand}`;
+    }
+
     prescriptionForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
@@ -1523,14 +1759,20 @@ Amoxicillin"
         submitBtn.textContent = 'Sending...';
 
         const formData = new FormData(prescriptionForm);
+        const orderRef = currentOrderRef;
 
         const order = {
+            orderRef: orderRef,
             customerName: formData.get('name'),
             phone: formData.get('phone'),
             email: formData.get('email'),
             orderType: formData.get('orderType'),
             medicine: formData.get('medicine'),
             collectionMethod: formData.get('collection'),
+            paymentMethod: formData.get('paymentMethod'),
+            paymentStatus: (formData.get('paymentMethod') === 'Link')
+                ? 'Awaiting Verification'
+                : 'N/A (Cash)',
             address: formData.get('address'),
             notes: formData.get('notes'),
             status: 'Pending',
@@ -1538,50 +1780,178 @@ Amoxicillin"
         };
 
         try {
-
             const firebaseResponse = await fetch(FIREBASE_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(order)
             });
 
             const formspreeResponse = await fetch(FORMSPREE_ENDPOINT, {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
+                headers: { 'Accept': 'application/json' }
             });
 
             if (firebaseResponse.ok && formspreeResponse.ok) {
 
+                document.getElementById('orderRefDisplay').textContent = orderRef;
+
+                const waMessage = encodeURIComponent(
+                    `Hi DONAPEX, confirming my order.\nRef: ${orderRef}\nType: ${order.orderType}\nMedicine: ${order.medicine}\nCollection: ${order.collectionMethod || 'Not specified'}`
+                );
+                document.getElementById('whatsappConfirmBtn').href = `https://wa.me/27715737749?text=${waMessage}`;
+
                 successBox.style.display = 'block';
-
                 prescriptionForm.reset();
-
                 uploadSection.style.display = 'none';
                 deliveryAddress.style.display = 'none';
+                linkPaymentSection.style.display = 'none';
+                currentOrderRef = generateOrderRef();
+                updateSubmitAvailability();
 
             } else {
-
                 errorBox.style.display = 'block';
-
             }
 
         } catch (error) {
-
             console.error(error);
             errorBox.style.display = 'block';
-
         } finally {
-
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Order';
-
         }
     });
+
+    /* Emergency Assist modal */
+    const emergencyFabBtn = document.getElementById('emergencyFabBtn');
+    const emergencyModal = document.getElementById('emergencyModal');
+    const closeEmergencyModal = document.getElementById('closeEmergencyModal');
+
+    emergencyFabBtn.addEventListener('click', () => {
+        emergencyModal.classList.add('open');
+    });
+
+    closeEmergencyModal.addEventListener('click', () => {
+        emergencyModal.classList.remove('open');
+    });
+
+    emergencyModal.addEventListener('click', (e) => {
+        if (e.target === emergencyModal) {
+            emergencyModal.classList.remove('open');
+        }
+    });
+
+    /* Track My Order */
+    const trackPhoneInput = document.getElementById('trackPhone');
+    const trackOrderBtn = document.getElementById('trackOrderBtn');
+    const trackError = document.getElementById('trackError');
+    const trackResults = document.getElementById('trackResults');
+
+    function normalizePhone(str) {
+        return (str || '').replace(/\D/g, '');
+    }
+
+    function escapeHtmlTrack(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    trackOrderBtn.addEventListener('click', async () => {
+        trackError.style.display = 'none';
+        trackResults.innerHTML = '';
+
+        const enteredPhone = normalizePhone(trackPhoneInput.value);
+        if (!enteredPhone) {
+            trackError.textContent = 'Please enter a phone number.';
+            trackError.style.display = 'block';
+            return;
+        }
+
+        trackOrderBtn.disabled = true;
+        trackOrderBtn.textContent = 'Searching…';
+
+        try {
+            const response = await fetch(FIREBASE_URL);
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            const data = await response.json();
+            const allOrders = data || {};
+
+            const matches = Object.values(allOrders).filter(o => normalizePhone(o.phone) === enteredPhone);
+
+            if (matches.length === 0) {
+                trackError.textContent = 'No orders found for that phone number. Please check the number and try again.';
+                trackError.style.display = 'block';
+            } else {
+                matches.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+                matches.forEach(o => {
+                    const div = document.createElement('div');
+                    div.className = 'track-order-item';
+                    const placed = o.createdAt ? new Date(o.createdAt).toLocaleString() : '—';
+                    const status = o.status || 'Pending';
+                    div.innerHTML = `
+                    <div class="ref">Ref: ${o.orderRef || '—'}</div>
+                    <div style="margin:6px 0;"><strong>${escapeHtmlTrack(o.medicine || '')}</strong></div>
+                    <div style="font-size:0.85rem; color: var(--ink-soft);">Placed: ${placed}</div>
+                    <span class="track-status-badge ${status}">${status}</span>
+                `;
+                    trackResults.appendChild(div);
+                });
+            }
+        } catch (err) {
+            console.error('Failed to fetch orders for tracking', err);
+            trackError.textContent = "Couldn't reach the order database. Please check your internet connection and try again.";
+            trackError.style.display = 'block';
+        } finally {
+            trackOrderBtn.disabled = false;
+            trackOrderBtn.textContent = 'Look Up My Orders';
+        }
+    });
+
+    /* SnapScan config — replace with your real SnapCode once your merchant account is approved */
+    const SNAPSCAN_SNAPCODE = 'donapexpharmacy';
+
+    const paymentMethodSelect = document.getElementById('paymentMethod');
+    const linkPaymentSection = document.getElementById('linkPaymentSection');
+    const payNowLink = document.getElementById('payNowLink');
+    let currentOrderRef = generateOrderRef();
+
+    const paymentProofSection = document.getElementById('paymentProofSection');
+    const paymentProofInput = document.getElementById('paymentProof');
+    const paymentProofNote = document.getElementById('paymentProofNote');
+
+    function updateSubmitAvailability() {
+        const method = paymentMethodSelect.value;
+        const requiresProof = (method === 'Link');
+
+        if (requiresProof) {
+            paymentProofSection.style.display = 'block';
+            paymentProofInput.required = true;
+            const hasFile = paymentProofInput.files && paymentProofInput.files.length > 0;
+            submitBtn.disabled = !hasFile;
+            paymentProofNote.style.display = hasFile ? 'none' : 'block';
+        } else {
+            paymentProofSection.style.display = 'none';
+            paymentProofInput.required = false;
+            paymentProofInput.value = '';
+            paymentProofNote.style.display = 'none';
+            submitBtn.disabled = false;
+        }
+    }
+
+    paymentMethodSelect.addEventListener('change', function () {
+        linkPaymentSection.style.display = 'none';
+
+      if (this.value === 'Link') {
+            linkPaymentSection.style.display = 'block';
+            payNowLink.href = `https://pos.snapscan.io/qr/${SNAPSCAN_SNAPCODE}?id=${currentOrderRef}`;
+        }
+
+        updateSubmitAvailability();
+    });
+
+    paymentProofInput.addEventListener('change', updateSubmitAvailability);
+
 </script>
 
 </body>
