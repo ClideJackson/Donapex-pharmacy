@@ -217,9 +217,13 @@
             font-size: 0.78rem;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--accent);
+            color: var(--ink);
             margin-bottom: 14px;
             display: block;
+        }
+
+        .hero .eyebrow {
+            color: #FFFFFF;
         }
 
         .hero h1 {
@@ -1085,6 +1089,70 @@
             line-height: 1.5;
         }
 
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .tip-card {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .tip-card:hover {
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .tip-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--panel);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .tip-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+        }
+
+        .tip-card p {
+            font-size: 0.9rem;
+            color: var(--ink-soft);
+            margin: 0;
+        }
+
+        .tips-disclaimer {
+            font-size: 0.78rem;
+            color: var(--ink-soft);
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .logo-mark {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-emblem {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+
     </style>
 </head>
 <body>
@@ -1101,7 +1169,15 @@
 
 <header>
     <div class="header-inner wrap" style="padding-left:0;padding-right:0;">
-        <div class="logo">DONA<span>PEX</span></div>
+        <div class="logo logo-mark">
+            <svg class="logo-emblem" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="110" cy="110" r="100" fill="#00833E"/>
+                <circle cx="110" cy="110" r="100" fill="none" stroke="#FFC72C" stroke-width="7"/>
+                <rect x="88" y="58" width="44" height="104" rx="10" fill="#FFFFFF"/>
+                <rect x="58" y="88" width="104" height="44" rx="10" fill="#FFFFFF"/>
+            </svg>
+            <span><span style="color:#6FCB6F;">DONA</span><span style="color:var(--accent);">PEX</span><span style="color:#FFFFFF;"> PHARMACY</span></span>
+        </div>
         <nav class="desktop-nav">
             <a href="#services">Services</a>
             <a href="#about">About</a>
@@ -1135,10 +1211,10 @@
             <span class="status-label" id="statusLabel">Checking hours…</span>
         </div>
         <div>
-            <span class="eyebrow">Community Pharmacy</span>
-            <h1>Trusted care, right in your neighbourhood.</h1>
-            <p class="lead">DONAPEX is here for your everyday health needs — prescriptions, advice, and a team that
-                knows you by name.</p>
+            <span class="eyebrow">Pharmacy · Health · Beauty · Baby</span>
+            <h1>Everything your family needs, right in your neighbourhood.</h1>
+            <p class="lead">DONAPEX is your neighbourhood pharmacy for prescriptions and everyday health —
+                plus cosmetics, skincare, and baby essentials, with a team that knows you by name.</p>
             <div class="hero-ctas">
                 <a href="#prescription" class="btn btn-primary">Order Medicine</a>
                 <a href="tel:017 518 0188" class="btn btn-outline">Call now</a>
@@ -1154,8 +1230,8 @@
     <div class="wrap">
         <div class="section-head">
             <span class="eyebrow">What we offer</span>
-            <h2>Services</h2>
-            <p>A few of the ways we help keep our community healthy.</p>
+            <h2>Products & Services</h2>
+            <p>Everything your family needs, all under one roof.</p>
         </div>
         <div class="services-grid">
             <div class="service-card">
@@ -1244,6 +1320,31 @@
                 <h3>Over-the-counter medication</h3>
                 <p>Everyday essentials — pain relief, cold and flu, vitamins, and more — no prescription needed.</p>
             </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <circle cx="12" cy="8" r="5"/>
+                        <path d="M9 13v7"/>
+                        <path d="M15 13v7"/>
+                        <path d="M9 17h6"/>
+                    </svg>
+                </div>
+                <h3>Cosmetics & skincare</h3>
+                <p>Everyday beauty essentials, skincare, and personal care products.</p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" width="22" height="22">
+                        <circle cx="12" cy="6" r="3"/>
+                        <path d="M8 21v-4a4 4 0 0 1 8 0v4"/>
+                        <path d="M5 21h14"/>
+                    </svg>
+                </div>
+                <h3>Baby & toddler essentials</h3>
+                <p>Nappies, formula, wipes, and everyday baby care items.</p>
+            </div>
         </div>
     </div>
 </section>
@@ -1266,9 +1367,10 @@
         <div>
             <span class="eyebrow">Who we are</span>
             <h2>Care that knows your name.</h2>
-            <p>DONAPEX is an independent, community-focused pharmacy. We believe healthcare should feel personal — so
-                whether you're picking up a monthly prescription or just need advice, our team takes the time to
-                actually help.</p>
+            <p>DONAPEX is an independent, community-focused pharmacy and health store. We believe healthcare —
+                and everyday essentials like skincare, cosmetics, and baby care — should feel personal, so
+                whether you're picking up a monthly prescription or shopping for the family, our team takes
+                the time to actually help.</p>
         </div>
         <div class="about-stats">
             <div class="stat"><span class="num">9–6</span><span class="label">Open daily</span></div>
@@ -1304,6 +1406,72 @@
             <h3>Our Mission</h3>
             <p>To deliver accessible, compassionate, and innovative healthcare that puts every patient first.</p>
         </div>
+    </div>
+</section>
+
+<section id="healthTips">
+    <div class="wrap">
+        <div class="section-head">
+            <span class="eyebrow">Health & Wellness</span>
+            <h2>Tips From Our Team</h2>
+            <p>Practical, everyday advice — for anything more specific, our pharmacists are always happy to chat.</p>
+        </div>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                        <path d="M12 2v4"/><path d="m6.34 6.34-2.83-2.83"/><path d="M2 12h4"/>
+                        <path d="m6.34 17.66-2.83 2.83"/><path d="M12 22v-4"/>
+                        <path d="m17.66 17.66 2.83 2.83"/><path d="M22 12h-4"/>
+                        <path d="m17.66 6.34 2.83-2.83"/>
+                    </svg>
+                </div>
+                <h3>Winter Skin & Cold Season</h3>
+                <p>Cold, dry air can leave skin cracked and irritated. Moisturise right after bathing while skin
+                    is still damp, keep a lip balm handy, and drink water regularly — dehydration shows on skin
+                    before it shows anywhere else.</p>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                        <circle cx="12" cy="6" r="3"/><path d="M8 21v-4a4 4 0 0 1 8 0v4"/><path d="M5 21h14"/>
+                    </svg>
+                </div>
+                <h3>Baby Care Basics</h3>
+                <p>Change nappies frequently to prevent rash, and let skin air-dry for a few minutes before
+                    redressing baby. If a rash doesn't improve within a couple of days despite regular changes
+                    and barrier cream, it's worth having a pharmacist or doctor take a look.</p>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>
+                    </svg>
+                </div>
+                <h3>Staying on Top of Chronic Medication</h3>
+                <p>Try linking your refill date to something routine, like the 1st of the month, so it's easy
+                    to remember. If you're ever unsure whether it's time to reorder, our Track My Order tool
+                    or a quick WhatsApp to us can confirm your last order date.</p>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                        <path d="M12 9v4"/><path d="M12 17h.01"/>
+                        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    </svg>
+                </div>
+                <h3>When to Seek Help Urgently</h3>
+                <p>Difficulty breathing, chest pain, sudden severe allergic reactions, or symptoms that rapidly
+                    worsen need immediate medical attention — please go straight to a doctor, clinic, or
+                    emergency services rather than waiting. For urgent medication needs outside these
+                    situations, our Emergency Assist button is here to help.</p>
+            </div>
+        </div>
+        <p class="tips-disclaimer">
+            These tips are general information only and aren't a substitute for professional medical advice.
+            For anything specific to your health or medication, please speak to one of our pharmacists.
+        </p>
     </div>
 </section>
 
@@ -1427,11 +1595,11 @@
         <div class="section-head">
             <span class="eyebrow">Online Orders</span>
 
-            <h2>Order Your Medicine Online</h2>
+            <h2>Order Online</h2>
 
             <p>
-                Upload your prescription, tell us what medication you need,
-                and choose whether you would like to collect it in-store
+                Medication, cosmetics, baby products, or anything else we stock — tell us what you need,
+                upload a prescription if required, and choose whether you'd like to collect it in-store
                 or have it delivered.
             </p>
 
@@ -1443,7 +1611,10 @@
             <select id="orderType" name="orderType" required>
                 <option value="">Select</option>
                 <option value="Prescription">Prescription Medicine</option>
-                <option value="OTC">Over-the-counter (No Prescription)</option>
+                <option value="OTC">Over-the-counter Medicine</option>
+                <option value="Cosmetics">Cosmetics & Skincare</option>
+                <option value="Baby">Baby & Toddler Products</option>
+                <option value="Other">Other / General Item</option>
             </select>
 
             <div class="form-row">
@@ -1462,7 +1633,7 @@
             </div>
 
             <div class="form-row">
-                <label>Medicine(s) Required</label>
+                <label>Item(s) Required</label>
 
                 <textarea
                         name="medicine"
@@ -1470,7 +1641,9 @@
                         placeholder="Example:
 
 Panado
-Amoxicillin"
+Amoxicillin
+Baby formula (Stage 1)
+Facial moisturizer"
                         required></textarea>
 
             </div>
@@ -1709,6 +1882,7 @@ Amoxicillin"
     const submitBtn = document.getElementById('submitBtn');
     const successBox = document.getElementById('formSuccess');
     const errorBox = document.getElementById('formError');
+    let successBoxTimeout;
 
     const collectionMethod = document.getElementById('collectionMethod');
     const deliveryAddress = document.getElementById('deliveryAddress');
@@ -1799,6 +1973,7 @@ Amoxicillin"
                 const waMessage = encodeURIComponent(
                     `Hi DONAPEX, confirming my order.\nRef: ${orderRef}\nType: ${order.orderType}\nMedicine: ${order.medicine}\nCollection: ${order.collectionMethod || 'Not specified'}`
                 );
+
                 document.getElementById('whatsappConfirmBtn').href = `https://wa.me/27715737749?text=${waMessage}`;
 
                 successBox.style.display = 'block';
@@ -1808,6 +1983,11 @@ Amoxicillin"
                 linkPaymentSection.style.display = 'none';
                 currentOrderRef = generateOrderRef();
                 updateSubmitAvailability();
+
+                clearTimeout(successBoxTimeout);
+                successBoxTimeout = setTimeout(() => {
+                    successBox.style.display = "none";
+                }, 5000);
 
             } else {
                 errorBox.style.display = 'block';
