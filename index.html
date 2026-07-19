@@ -1153,6 +1153,48 @@
             flex-shrink: 0;
         }
 
+        .mobile-menu a.mobile-staff-link {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .status-badge {
+                border-radius: 16px;
+                padding: 10px 16px;
+                max-width: 220px;
+                text-align: center;
+            }
+
+            .status-label {
+                font-size: 0.85rem;
+                line-height: 1.3;
+            }
+
+            .dot {
+                margin-top: 2px;
+            }
+        }
+
+        .status-label-short {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .status-badge {
+                white-space: nowrap;
+            }
+
+            .status-label-full {
+                display: none;
+            }
+
+            .status-label-short {
+                display: inline;
+                font-size: 0.85rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1196,7 +1238,8 @@
         <a href="#services">Services</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
-        <a href="staff.html" target="_blank" class="staff-btn" style="width:100%; text-align:center; text-decoration:none; display:block;">Staff Login</a>    </div>
+        <a href="staff.html" target="_blank" class="mobile-staff-link">Staff Login</a>
+    </div>
 </header>
 
 <section class="hero">
@@ -1208,7 +1251,8 @@
     <div class="hero-inner">
         <div class="status-badge">
             <span class="dot" id="statusDot"></span>
-            <span class="status-label" id="statusLabel">Checking hours…</span>
+            <span class="status-label status-label-full" id="statusLabel">Checking hours…</span>
+            <span class="status-label status-label-short" id="statusLabelShort">Checking…</span>
         </div>
         <div>
             <span class="eyebrow">Pharmacy · Beauty · Baby</span>
@@ -1770,15 +1814,15 @@ Facial moisturizer"
         <div class="section-head">
             <span class="eyebrow">Already Ordered?</span>
             <h2>Track My Order</h2>
-            <p>Enter the phone number you used when placing your order to check its status.</p>
+            <p>Enter the reference number you received after placing your order to check its status.</p>
         </div>
         <div class="track-card">
             <div class="form-row">
-                <label for="trackPhone">Phone Number</label>
-                <input type="tel" id="trackPhone" placeholder="e.g. 082 123 4567">
+                <label for="trackRef">Order Reference Number</label>
+                <input type="text" id="trackRef" placeholder="e.g. DNX-ABC123">
             </div>
-            <button id="trackOrderBtn" class="btn btn-primary" style="width:100%; justify-content:center;">Look Up My Orders</button>
-            <div class="modal-error" id="trackError" style="margin-top:14px;">No orders found for that phone number. Please check the number and try again.</div>
+            <button id="trackOrderBtn" class="btn btn-primary" style="width:100%; justify-content:center;">Look Up My Order</button>
+            <div class="modal-error" id="trackError" style="margin-top:14px;">No order found with that reference number. Please check it and try again.</div>
             <div class="track-results" id="trackResults"></div>
         </div>
     </div>
@@ -1825,15 +1869,15 @@ Facial moisturizer"
     /* Open / Closed Status */
     function updateStatus() {
         const now = new Date();
-        const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+        const day = now.getDay();
         const minutesNow = now.getHours() * 60 + now.getMinutes();
 
         const isSunday = day === 0;
         const isSaturday = day === 6;
 
-        const openMinutes = 9 * 60; // 9:00 AM
-        const closeMinutes = isSaturday ? 17 * 60 : 18 * 60; // 5 PM Sat, 6 PM Mon-Fri
-        const closingSoonWindow = 30; // minutes before close to show "Closing soon"
+        const openMinutes = 9 * 60;
+        const closeMinutes = isSaturday ? 17 * 60 : 18 * 60;
+        const closingSoonWindow = 30;
 
         const isOpen = !isSunday && minutesNow >= openMinutes && minutesNow < closeMinutes;
         const isClosingSoon = isOpen && (closeMinutes - minutesNow) <= closingSoonWindow;
@@ -1842,19 +1886,28 @@ Facial moisturizer"
 
         const dot = document.getElementById('statusDot');
         const label = document.getElementById('statusLabel');
+        const labelShort = document.getElementById('statusLabelShort');
+
+        let fullText, shortText;
 
         if (isClosingSoon) {
-            dot.classList.add('closed'); // reuse red dot styling to signal urgency
-            label.textContent = `Closing soon · closes ${closeLabel}`;
+            dot.classList.add('closed');
+            fullText = `Closing soon · closes ${closeLabel}`;
+            shortText = 'Closing soon';
         } else if (isOpen) {
             dot.classList.remove('closed');
-            label.textContent = `Open now · closes ${closeLabel}`;
+            fullText = `Open now · closes ${closeLabel}`;
+            shortText = 'Open now';
         } else {
             dot.classList.add('closed');
-            label.textContent = (isSaturday && minutesNow >= closeMinutes)
+            fullText = (isSaturday && minutesNow >= closeMinutes)
                 ? 'Closed · opens Monday 9:00 AM'
                 : 'Closed · opens 9:00 AM';
+            shortText = 'Closed';
         }
+
+        label.textContent = fullText;
+        labelShort.textContent = shortText;
     }
 
     updateStatus();
@@ -2022,13 +2075,13 @@ Facial moisturizer"
     });
 
     /* Track My Order */
-    const trackPhoneInput = document.getElementById('trackPhone');
+    const trackRefInput = document.getElementById('trackRef');
     const trackOrderBtn = document.getElementById('trackOrderBtn');
     const trackError = document.getElementById('trackError');
     const trackResults = document.getElementById('trackResults');
 
-    function normalizePhone(str) {
-        return (str || '').replace(/\D/g, '');
+    function normalizeRef(str) {
+        return (str || '').trim().toUpperCase();
     }
 
     function escapeHtmlTrack(str) {
@@ -2041,9 +2094,9 @@ Facial moisturizer"
         trackError.style.display = 'none';
         trackResults.innerHTML = '';
 
-        const enteredPhone = normalizePhone(trackPhoneInput.value);
-        if (!enteredPhone) {
-            trackError.textContent = 'Please enter a phone number.';
+        const enteredRef = normalizeRef(trackRefInput.value);
+        if (!enteredRef) {
+            trackError.textContent = 'Please enter your order reference number.';
             trackError.style.display = 'block';
             return;
         }
@@ -2057,10 +2110,10 @@ Facial moisturizer"
             const data = await response.json();
             const allOrders = data || {};
 
-            const matches = Object.values(allOrders).filter(o => normalizePhone(o.phone) === enteredPhone);
+            const matches = Object.values(allOrders).filter(o => normalizeRef(o.orderRef) === enteredRef);
 
             if (matches.length === 0) {
-                trackError.textContent = 'No orders found for that phone number. Please check the number and try again.';
+                trackError.textContent = 'No order found with that reference number. Please check it and try again.';
                 trackError.style.display = 'block';
             } else {
                 matches.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
@@ -2070,11 +2123,11 @@ Facial moisturizer"
                     const placed = o.createdAt ? new Date(o.createdAt).toLocaleString() : '—';
                     const status = o.status || 'Pending';
                     div.innerHTML = `
-                    <div class="ref">Ref: ${o.orderRef || '—'}</div>
-                    <div style="margin:6px 0;"><strong>${escapeHtmlTrack(o.medicine || '')}</strong></div>
-                    <div style="font-size:0.85rem; color: var(--ink-soft);">Placed: ${placed}</div>
-                    <span class="track-status-badge ${status}">${status}</span>
-                `;
+                <div class="ref">Ref: ${o.orderRef || '—'}</div>
+                <div style="margin:6px 0;"><strong>${escapeHtmlTrack(o.medicine || '')}</strong></div>
+                <div style="font-size:0.85rem; color: var(--ink-soft);">Placed: ${placed}</div>
+                <span class="track-status-badge ${status}">${status}</span>
+            `;
                     trackResults.appendChild(div);
                 });
             }
@@ -2084,7 +2137,7 @@ Facial moisturizer"
             trackError.style.display = 'block';
         } finally {
             trackOrderBtn.disabled = false;
-            trackOrderBtn.textContent = 'Look Up My Orders';
+            trackOrderBtn.textContent = 'Look Up My Order';
         }
     });
 
