@@ -866,6 +866,17 @@
                 padding-top: 40px;
             }
 
+            .hero-ctas {
+                gap: 10px;
+            }
+
+            .hero-ctas .btn {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+                flex: 1 1 calc(50% - 10px);
+                justify-content: center;
+            }
+
             .about {
                 grid-template-columns: 1fr;
                 padding: 32px;
@@ -1014,6 +1025,10 @@
             }
             .emergency-fab {
                 padding: 14px;
+            }
+            .hero-ctas .btn {
+                font-size: 0.8rem;
+                padding: 9px 12px;
             }
         }
 
@@ -1260,9 +1275,10 @@
             <p class="lead">DONAPEX is your neighbourhood pharmacy for prescriptions and everyday health —
                 plus cosmetics, skincare, and baby essentials, with a team that knows you by name.</p>
             <div class="hero-ctas">
-                <a href="#prescription" class="btn btn-primary">Order Medicine</a>
-                <a href="tel:017 518 0188" class="btn btn-outline">Call now</a>
-                <a href="https://wa.me/27715737749" class="btn btn-outline" target="_blank">
+                <a href="order.html" class="btn btn-primary">Order online</a>
+                <a href="appointment.html" class="btn btn-primary">Book Appt</a>
+                <a href="tel:017 518 0188" class="btn btn-primary">Call now</a>
+                <a href="https://wa.me/27715737749" class="btn btn-primary" target="_blank">
                     WhatsApp Us
                 </a>
             </div>
@@ -1632,183 +1648,6 @@
     </div>
 </section>
 
-<section id="prescription">
-
-    <div class="wrap">
-
-        <div class="section-head">
-            <span class="eyebrow">Online Orders</span>
-
-            <h2>Order Online</h2>
-
-            <p>
-                Medication, cosmetics, baby products, or anything else we stock — tell us what you need,
-                upload a prescription if required, and choose whether you'd like to collect it in-store
-                or have it delivered.
-            </p>
-
-        </div>
-
-        <form id="prescriptionForm" enctype="multipart/form-data">
-            <label>Order Type</label>
-
-            <select id="orderType" name="orderType" required>
-                <option value="">Select</option>
-                <option value="Prescription">Prescription Medicine</option>
-                <option value="OTC">Over-the-counter Medicine</option>
-                <option value="Cosmetics">Cosmetics & Skincare</option>
-                <option value="Baby">Baby & Toddler Products</option>
-                <option value="Other">Other / General Item</option>
-            </select>
-
-            <div class="form-row">
-                <label>Full Name</label>
-                <input type="text" id="name" name="name" required placeholder="e.g. Jacky Hlongo">
-            </div>
-
-            <div class="form-row">
-                <label>Phone Number</label>
-                <input type="tel" id="phone" name="phone" required placeholder="e.g. 082 123 4567">
-            </div>
-
-            <div class="form-row">
-                <label>Email Address</label>
-                <input type="email" name="email">
-            </div>
-
-            <div class="form-row">
-                <label>Item(s) Required</label>
-
-                <textarea
-                        name="medicine"
-                        rows="4"
-                        placeholder="Example:
-
-Panado
-Amoxicillin
-Baby formula (Stage 1)
-Facial moisturizer"
-                        required></textarea>
-
-            </div>
-
-            <div class="form-row" id="uploadSection" style="display:none;">
-
-                <label>Upload Prescription</label>
-
-                <input
-                        type="file"
-                        id="prescriptionFile"
-                        name="prescription"
-                        accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-
-            <div class="form-row">
-
-                <label>Collection Method</label>
-
-                <select id="collectionMethod" name="collection">
-
-                    <option value="">Select</option>
-
-                    <option value="Collection">
-                        Collect In Store
-                    </option>
-
-                    <option value="Delivery">
-                        Home Delivery
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div class="form-row">
-                <label>Payment Method</label>
-                <select id="paymentMethod" name="paymentMethod" required>
-                    <option value="">Select</option>
-                    <option value="COD">Cash on Delivery / Collection</option>
-                    <option value="Link">Pay Now (opens SnapScan)</option>
-                </select>
-            </div>
-
-            <div class="form-row" id="linkPaymentSection" style="display:none;">
-                <div class="payment-box">
-                    <p class="payment-instructions">
-                        Tap below to open SnapScan and pay directly. Your order reference will be
-                        included automatically — please enter the amount your pharmacist confirms with you.
-                    </p>
-                    <a id="payNowLink" href="#" target="_blank" class="btn btn-primary" style="width:100%; justify-content:center;">
-                        💳 Pay Now via SnapScan
-                    </a>
-                </div>
-            </div>
-
-            <div class="form-row" id="paymentProofSection" style="display:none;">
-                <label>Upload Proof of Payment</label>
-                <input type="file" id="paymentProof" name="paymentProof" accept=".pdf,.jpg,.jpeg,.png">
-                <p class="form-note" id="paymentProofNote" style="display:none; color:#8A2E24; margin-top:6px;">
-                    Please upload proof of payment to submit your order.
-                </p>
-            </div>
-
-            <div
-                    class="form-row"
-                    id="deliveryAddress"
-                    style="display:none;">
-
-                <label>Delivery Address</label>
-
-                <textarea
-                        name="address"
-                        rows="3"></textarea>
-
-            </div>
-
-            <div class="form-row">
-
-                <label>Additional Notes</label>
-
-                <textarea
-                        name="notes"
-                        rows="4"></textarea>
-
-            </div>
-
-            <div id="formSuccess" class="form-success">
-                <div class="order-ref-box">
-                    ✅ Order submitted successfully.<br>
-                    Your reference number: <strong id="orderRefDisplay"></strong>
-                </div>
-                We will contact you shortly.
-                <div style="margin-top:12px;">
-                    <a href="#" id="whatsappConfirmBtn" target="_blank" class="btn btn-outline" style="border-color: var(--primary); color: var(--primary-dark); width:100%; justify-content:center;">
-                        💬 Send yourself a WhatsApp confirmation
-                    </a>
-                </div>
-            </div>
-
-            <div id="formError" class="form-error">
-                ❌ Something went wrong.
-                Please try again.
-            </div>
-
-            <button
-                    id="submitBtn"
-                    type="submit"
-                    class="btn btn-primary"
-                    style="width:100%;justify-content:center;">
-
-                Submit Order
-
-            </button>
-
-        </form>
-
-    </div>
-
-</section>
-
 <section id="trackOrder">
     <div class="wrap">
         <div class="section-head">
@@ -1931,130 +1770,6 @@ Facial moisturizer"
     const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xdaqnedw';
     const FIREBASE_URL = 'https://donapex-pharmacy-default-rtdb.europe-west1.firebasedatabase.app/orders.json';
 
-    const prescriptionForm = document.getElementById('prescriptionForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const successBox = document.getElementById('formSuccess');
-    const errorBox = document.getElementById('formError');
-    let successBoxTimeout;
-
-    const collectionMethod = document.getElementById('collectionMethod');
-    const deliveryAddress = document.getElementById('deliveryAddress');
-
-    const orderType = document.getElementById('orderType');
-    const uploadSection = document.getElementById('uploadSection');
-    const prescriptionFile = document.getElementById('prescriptionFile');
-
-    /* Initial State */
-    uploadSection.style.display = 'none';
-    deliveryAddress.style.display = 'none';
-
-    /* Prescription Upload Toggle */
-    orderType.addEventListener('change', function () {
-        if (this.value === 'Prescription') {
-            uploadSection.style.display = 'block';
-            prescriptionFile.required = true;
-        } else {
-            uploadSection.style.display = 'none';
-            prescriptionFile.required = false;
-            prescriptionFile.value = '';
-        }
-    });
-
-    /* Delivery Address Toggle */
-    collectionMethod.addEventListener('change', function () {
-        if (this.value === 'Delivery') {
-            deliveryAddress.style.display = 'block';
-        } else {
-            deliveryAddress.style.display = 'none';
-        }
-    });
-
-    /* Form Submission */
-    function generateOrderRef() {
-        const ts = Date.now().toString(36).toUpperCase().slice(-5);
-        const rand = Math.random().toString(36).toUpperCase().slice(2, 4);
-        return `DNX-${ts}${rand}`;
-    }
-
-    prescriptionForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        successBox.style.display = 'none';
-        errorBox.style.display = 'none';
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-
-        const formData = new FormData(prescriptionForm);
-        const orderRef = currentOrderRef;
-
-        const order = {
-            orderRef: orderRef,
-            customerName: formData.get('name'),
-            phone: formData.get('phone'),
-            email: formData.get('email'),
-            orderType: formData.get('orderType'),
-            medicine: formData.get('medicine'),
-            collectionMethod: formData.get('collection'),
-            paymentMethod: formData.get('paymentMethod'),
-            paymentStatus: (formData.get('paymentMethod') === 'Link')
-                ? 'Awaiting Verification'
-                : 'N/A (Cash)',
-            address: formData.get('address'),
-            notes: formData.get('notes'),
-            status: 'Pending',
-            createdAt: new Date().toISOString()
-        };
-
-        try {
-            const firebaseResponse = await fetch(FIREBASE_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(order)
-            });
-
-            const formspreeResponse = await fetch(FORMSPREE_ENDPOINT, {
-                method: 'POST',
-                body: formData,
-                headers: { 'Accept': 'application/json' }
-            });
-
-            if (firebaseResponse.ok && formspreeResponse.ok) {
-
-                document.getElementById('orderRefDisplay').textContent = orderRef;
-
-                const waMessage = encodeURIComponent(
-                    `Hi DONAPEX, confirming my order.\nRef: ${orderRef}\nType: ${order.orderType}\nMedicine: ${order.medicine}\nCollection: ${order.collectionMethod || 'Not specified'}`
-                );
-
-                document.getElementById('whatsappConfirmBtn').href = `https://wa.me/27715737749?text=${waMessage}`;
-
-                successBox.style.display = 'block';
-                prescriptionForm.reset();
-                uploadSection.style.display = 'none';
-                deliveryAddress.style.display = 'none';
-                linkPaymentSection.style.display = 'none';
-                currentOrderRef = generateOrderRef();
-                updateSubmitAvailability();
-
-                clearTimeout(successBoxTimeout);
-                successBoxTimeout = setTimeout(() => {
-                    successBox.style.display = "none";
-                }, 5000);
-
-            } else {
-                errorBox.style.display = 'block';
-            }
-
-        } catch (error) {
-            console.error(error);
-            errorBox.style.display = 'block';
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Order';
-        }
-    });
-
     /* Emergency Assist modal */
     const emergencyFabBtn = document.getElementById('emergencyFabBtn');
     const emergencyModal = document.getElementById('emergencyModal');
@@ -2140,52 +1855,6 @@ Facial moisturizer"
             trackOrderBtn.textContent = 'Look Up My Order';
         }
     });
-
-    /* SnapScan config — replace with your real SnapCode once your merchant account is approved */
-    const SNAPSCAN_SNAPCODE = 'donapexpharmacy';
-
-    const paymentMethodSelect = document.getElementById('paymentMethod');
-    const linkPaymentSection = document.getElementById('linkPaymentSection');
-    const payNowLink = document.getElementById('payNowLink');
-    let currentOrderRef = generateOrderRef();
-
-    const paymentProofSection = document.getElementById('paymentProofSection');
-    const paymentProofInput = document.getElementById('paymentProof');
-    const paymentProofNote = document.getElementById('paymentProofNote');
-
-    function updateSubmitAvailability() {
-        const method = paymentMethodSelect.value;
-        const requiresProof = (method === 'Link');
-
-        if (requiresProof) {
-            paymentProofSection.style.display = 'block';
-            paymentProofInput.required = true;
-            const hasFile = paymentProofInput.files && paymentProofInput.files.length > 0;
-            submitBtn.disabled = !hasFile;
-            paymentProofNote.style.display = hasFile ? 'none' : 'block';
-        } else {
-            paymentProofSection.style.display = 'none';
-            paymentProofInput.required = false;
-            paymentProofInput.value = '';
-            paymentProofNote.style.display = 'none';
-            submitBtn.disabled = false;
-        }
-    }
-
-    paymentMethodSelect.addEventListener('change', function () {
-        linkPaymentSection.style.display = 'none';
-
-      if (this.value === 'Link') {
-            linkPaymentSection.style.display = 'block';
-            payNowLink.href = `https://pos.snapscan.io/qr/${SNAPSCAN_SNAPCODE}?id=${currentOrderRef}`;
-        }
-
-        updateSubmitAvailability();
-    });
-
-    paymentProofInput.addEventListener('change', updateSubmitAvailability);
-
 </script>
-
 </body>
 </html>

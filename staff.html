@@ -346,9 +346,10 @@
             <button class="btn btn-outline" id="logoutBtn" style="border-color: var(--primary); color: var(--primary-dark);">Log out</button>
         </div>
 
-        <div class="stock-tabs">
+        <div class="stock-tabs" style="display:flex; gap:10px; margin-bottom:20px;">
             <button class="btn btn-outline" id="tabStockBtn" style="border-color: var(--primary); color: var(--primary-dark);">Stock</button>
             <button class="btn btn-outline" id="tabOrdersBtn" style="border-color: var(--line); color: var(--ink);">Orders</button>
+            <button class="btn btn-outline" id="tabApptBtn" style="border-color: var(--line); color: var(--ink);">Appointments</button>
         </div>
 
         <div id="stockView">
@@ -418,6 +419,28 @@
                 <div class="empty-state" id="ordersEmptyState" style="display:none;">No orders yet.</div>
             </div>
         </div>
+
+        <div id="apptView" style="display:none;">
+            <div class="modal-error" id="apptLoadError" style="display:none; margin-bottom:16px;">
+                Couldn't reach the appointments database. Check your internet connection and try logging out and back in.
+            </div>
+            <div class="stock-table-wrap">
+                <table class="stock-table" id="apptTable">
+                    <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Contact</th>
+                        <th>Service</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                    </tr>
+                    </thead>
+                    <tbody id="apptTableBody"></tbody>
+                </table>
+                <div class="empty-state" id="apptEmptyState" style="display:none;">No appointments yet.</div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -467,20 +490,42 @@
     tabStockBtn.addEventListener('click', () => {
         stockView.style.display = 'block';
         ordersView.style.display = 'none';
+        apptView.style.display = 'none';
         tabStockBtn.style.borderColor = 'var(--primary)';
         tabStockBtn.style.color = 'var(--primary-dark)';
         tabOrdersBtn.style.borderColor = 'var(--line)';
         tabOrdersBtn.style.color = 'var(--ink)';
+        tabApptBtn.style.borderColor = 'var(--line)';
+        tabApptBtn.style.color = 'var(--ink)';
     });
 
     tabOrdersBtn.addEventListener('click', () => {
         stockView.style.display = 'none';
         ordersView.style.display = 'block';
+        apptView.style.display = 'none';
         tabOrdersBtn.style.borderColor = 'var(--primary)';
         tabOrdersBtn.style.color = 'var(--primary-dark)';
         tabStockBtn.style.borderColor = 'var(--line)';
         tabStockBtn.style.color = 'var(--ink)';
+        tabApptBtn.style.borderColor = 'var(--line)';
+        tabApptBtn.style.color = 'var(--ink)';
         loadOrders();
+    });
+
+    const tabApptBtn = document.getElementById('tabApptBtn');
+    const apptView = document.getElementById('apptView');
+
+    tabApptBtn.addEventListener('click', () => {
+        stockView.style.display = 'none';
+        ordersView.style.display = 'none';
+        apptView.style.display = 'block';
+        tabApptBtn.style.borderColor = 'var(--primary)';
+        tabApptBtn.style.color = 'var(--primary-dark)';
+        tabStockBtn.style.borderColor = 'var(--line)';
+        tabStockBtn.style.color = 'var(--ink)';
+        tabOrdersBtn.style.borderColor = 'var(--line)';
+        tabOrdersBtn.style.color = 'var(--ink)';
+        loadAppointments();
     });
 
     async function loadStock() {
@@ -707,6 +752,85 @@
         saveStock();
         e.target.reset();
         document.getElementById('itemName').focus();
+    });
+
+    const FIREBASE_APPT_URL = `${FIREBASE_DB_URL}/appointments.json`;
+    let appointmentsData = {};
+
+    async function loadAppointments() {
+        const errorBox = document.getElementById('apptLoadError');
+        errorBox.style.display = 'none';
+        const emptyState = document.getElementById('apptEmptyState');
+        emptyState.textContent = 'Loading appointments…';
+        emptyState.style.display = 'block';
+        try {
+            const response = await fetch(FIREBASE_APPT_URL);
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            const data = await response.json();
+            appointmentsData = data || {};
+        } catch (err) {
+            console.error('Failed to load appointments', err);
+            appointmentsData = {};
+            errorBox.style.display = 'block';
+        }
+        emptyState.textContent = 'No appointments yet.';
+        renderAppointments();
+    }
+
+    function renderAppointments() {
+        const tbody = document.getElementById('apptTableBody');
+        const emptyState = document.getElementById('apptEmptyState');
+        tbody.innerHTML = '';
+
+        const ids = Object.keys(appointmentsData).sort((a, b) => {
+            return (appointmentsData[a].date + appointmentsData[a].time).localeCompare(appointmentsData[b].date + appointmentsData[b].time);
+        });
+
+        if (ids.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        ids.forEach(id => {
+            const a = appointmentsData[id];
+            const row = document.createElement('tr');
+            const requested = a.createdAt ? new Date(a.createdAt).toLocaleString() : '—';
+
+            row.innerHTML = `
+            <td>${escapeHtml(a.customerName || '—')}</td>
+            <td>${escapeHtml(a.phone || '—')}</td>
+            <td>${escapeHtml(a.service || '—')}</td>
+            <td>${escapeHtml(a.date || '—')} · ${escapeHtml(a.time || '—')}</td>
+            <td>
+              <select class="appt-status-select" data-id="${id}">
+                <option value="Pending" ${a.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                <option value="Confirmed" ${a.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                <option value="Completed" ${a.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                <option value="Cancelled" ${a.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+            </td>
+            <td style="font-size:0.85em;">${requested}</td>
+        `;
+            tbody.appendChild(row);
+        });
+    }
+
+    document.getElementById('apptTableBody').addEventListener('change', async (e) => {
+        if (!e.target.classList.contains('appt-status-select')) return;
+        const id = e.target.dataset.id;
+        const newStatus = e.target.value;
+        try {
+            const response = await fetch(`${FIREBASE_DB_URL}/appointments/${id}.json`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            appointmentsData[id].status = newStatus;
+        } catch (err) {
+            console.error('Failed to update appointment status', err);
+        }
     });
 </script>
 
