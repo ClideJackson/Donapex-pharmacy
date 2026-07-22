@@ -304,6 +304,11 @@
             font-size: 0.9rem;
         }
 
+        .staff-user-badge {
+            font-size: 0.85rem;
+            color: #E7F5E2;
+        }
+
         @media (max-width: 900px) {
             .stock-add-form { grid-template-columns: 1fr 1fr; }
         }
@@ -325,11 +330,15 @@
 <div id="loginGate">
     <div class="login-box">
         <h2>Staff Login</h2>
-        <p class="sub">Enter the staff password to manage stock and orders.</p>
-        <div class="modal-error" id="loginError">Incorrect password. Please try again.</div>
+        <p class="sub">Sign in with your staff email and password to manage stock and orders.</p>
+        <div class="modal-error" id="loginError">Incorrect email or password. Please try again.</div>
+        <div class="form-row">
+            <label for="staffEmail">Email</label>
+            <input type="email" id="staffEmail" placeholder="you@donapex.co.za" autocomplete="username">
+        </div>
         <div class="form-row">
             <label for="staffPassword">Password</label>
-            <input type="password" id="staffPassword" placeholder="Staff password">
+            <input type="password" id="staffPassword" placeholder="Staff password" autocomplete="current-password">
         </div>
         <button class="btn btn-primary" id="submitLogin" style="width:100%; justify-content:center;">Log in</button>
     </div>
@@ -343,7 +352,10 @@
                 <span style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--primary);">Staff Only</span>
                 <h2>Stock Manager</h2>
             </div>
-            <button class="btn btn-outline" id="logoutBtn" style="border-color: var(--primary); color: var(--primary-dark);">Log out</button>
+            <div style="display:flex; align-items:center; gap:16px;">
+                <span class="staff-user-badge" id="staffUserBadge" style="color: var(--ink-soft);"></span>
+                <button class="btn btn-outline" id="logoutBtn" style="border-color: var(--primary); color: var(--primary-dark);">Log out</button>
+            </div>
         </div>
 
         <div class="stock-tabs" style="display:flex; gap:10px; margin-bottom:20px;">
@@ -444,48 +456,108 @@
     </div>
 </section>
 
-<script>
-    const STAFF_PASSWORD = 'donapex2026';
+<script type="module">
+    // ── Firebase setup ─────────────────────────────────────────────
+    // PASTE YOUR firebaseConfig FROM Project settings → Your apps BELOW.
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBBo1oVnLXcQg8AIoILTQj9SJ4V4mZaEUs",
+        authDomain: "donapex-pharmacy.firebaseapp.com",
+        databaseURL: "https://donapex-pharmacy-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "donapex-pharmacy",
+        storageBucket: "donapex-pharmacy.firebasestorage.app",
+        messagingSenderId: "288469310878",
+        appId: "1:288469310878:web:6d34dec8ff8c92237b4a8f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
     const FIREBASE_DB_URL = 'https://donapex-pharmacy-default-rtdb.europe-west1.firebasedatabase.app';
 
+    let currentIdToken = null; // attached to every DB request once signed in
     let stockItems = [];
     let ordersData = {};
 
     const loginGate = document.getElementById('loginGate');
     const stockPanel = document.getElementById('stockPanel');
+    const staffEmailInput = document.getElementById('staffEmail');
     const staffPasswordInput = document.getElementById('staffPassword');
     const loginError = document.getElementById('loginError');
     const submitLogin = document.getElementById('submitLogin');
     const logoutBtn = document.getElementById('logoutBtn');
+    const staffUserBadge = document.getElementById('staffUserBadge');
 
     const tabStockBtn = document.getElementById('tabStockBtn');
     const tabOrdersBtn = document.getElementById('tabOrdersBtn');
+    const tabApptBtn = document.getElementById('tabApptBtn');
     const stockView = document.getElementById('stockView');
     const ordersView = document.getElementById('ordersView');
+    const apptView = document.getElementById('apptView');
 
-    function handleLogin() {
-        if (staffPasswordInput.value === STAFF_PASSWORD) {
-            loginGate.style.display = 'none';
-            stockPanel.style.display = 'block';
-            loadStock();
-        } else {
+    // ── Auth wiring ────────────────────────────────────────────────
+    async function handleLogin() {
+        loginError.style.display = 'none';
+        submitLogin.disabled = true;
+        submitLogin.textContent = 'Logging in…';
+        try {
+            await signInWithEmailAndPassword(auth, staffEmailInput.value.trim(), staffPasswordInput.value);
+            // onAuthStateChanged below handles showing the panel
+        } catch (err) {
+            console.error('Login failed', err);
             loginError.style.display = 'block';
+        } finally {
+            submitLogin.disabled = false;
+            submitLogin.textContent = 'Log in';
         }
     }
 
     submitLogin.addEventListener('click', handleLogin);
-    staffPasswordInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleLogin();
+    [staffEmailInput, staffPasswordInput].forEach(el => {
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
     });
-    staffPasswordInput.focus();
+    staffEmailInput.focus();
 
-    logoutBtn.addEventListener('click', () => {
-        stockPanel.style.display = 'none';
-        loginGate.style.display = 'flex';
-        staffPasswordInput.value = '';
-        loginError.style.display = 'none';
-        staffPasswordInput.focus();
+    logoutBtn.addEventListener('click', () => signOut(auth));
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentIdToken = await user.getIdToken();
+            loginGate.style.display = 'none';
+            stockPanel.style.display = 'block';
+            staffUserBadge.textContent = user.email || '';
+            loadStock();
+        } else {
+            currentIdToken = null;
+            stockPanel.style.display = 'none';
+            loginGate.style.display = 'flex';
+            staffPasswordInput.value = '';
+            staffEmailInput.focus();
+        }
     });
+
+    // Refresh the token every ~50 min so long staff sessions don't expire mid-shift
+    setInterval(async () => {
+        if (auth.currentUser) {
+            try { currentIdToken = await auth.currentUser.getIdToken(true); }
+            catch (err) { console.error('Token refresh failed', err); }
+        }
+    }, 50 * 60 * 1000);
+
+    // Small helper: appends the auth token to a Firebase REST URL when we have one
+    function dbUrl(path) {
+        const base = `${FIREBASE_DB_URL}${path}`;
+        return currentIdToken ? `${base}?auth=${currentIdToken}` : base;
+    }
 
     tabStockBtn.addEventListener('click', () => {
         stockView.style.display = 'block';
@@ -512,9 +584,6 @@
         loadOrders();
     });
 
-    const tabApptBtn = document.getElementById('tabApptBtn');
-    const apptView = document.getElementById('apptView');
-
     tabApptBtn.addEventListener('click', () => {
         stockView.style.display = 'none';
         ordersView.style.display = 'none';
@@ -528,6 +597,7 @@
         loadAppointments();
     });
 
+    // ── Stock ──────────────────────────────────────────────────────
     async function loadStock() {
         const errorBox = document.getElementById('stockLoadError');
         errorBox.style.display = 'none';
@@ -535,7 +605,7 @@
         emptyState.textContent = 'Loading stock…';
         emptyState.style.display = 'block';
         try {
-            const response = await fetch(`${FIREBASE_DB_URL}/stock.json`);
+            const response = await fetch(dbUrl('/stock.json'));
             if (!response.ok) throw new Error('Bad response: ' + response.status);
             const data = await response.json();
             stockItems = Array.isArray(data) ? data.filter(Boolean) : (data ? Object.values(data) : []);
@@ -551,7 +621,7 @@
     async function saveStock() {
         const errorBox = document.getElementById('stockLoadError');
         try {
-            const response = await fetch(`${FIREBASE_DB_URL}/stock.json`, {
+            const response = await fetch(dbUrl('/stock.json'), {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(stockItems)
@@ -628,6 +698,7 @@
         return div.innerHTML;
     }
 
+    // ── Orders ─────────────────────────────────────────────────────
     async function loadOrders() {
         const errorBox = document.getElementById('ordersLoadError');
         errorBox.style.display = 'none';
@@ -635,7 +706,7 @@
         emptyState.textContent = 'Loading orders…';
         emptyState.style.display = 'block';
         try {
-            const response = await fetch(`${FIREBASE_DB_URL}/orders.json`);
+            const response = await fetch(dbUrl('/orders.json'));
             if (!response.ok) throw new Error('Bad response: ' + response.status);
             const data = await response.json();
             ordersData = data || {};
@@ -694,7 +765,7 @@
         const id = e.target.dataset.id;
         const newStatus = e.target.value;
         try {
-            const response = await fetch(`${FIREBASE_DB_URL}/orders/${id}.json`, {
+            const response = await fetch(dbUrl(`/orders/${id}.json`), {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({status: newStatus})
@@ -754,7 +825,7 @@
         document.getElementById('itemName').focus();
     });
 
-    const FIREBASE_APPT_URL = `${FIREBASE_DB_URL}/appointments.json`;
+    // ── Appointments ───────────────────────────────────────────────
     let appointmentsData = {};
 
     async function loadAppointments() {
@@ -764,7 +835,7 @@
         emptyState.textContent = 'Loading appointments…';
         emptyState.style.display = 'block';
         try {
-            const response = await fetch(FIREBASE_APPT_URL);
+            const response = await fetch(dbUrl('/appointments.json'));
             if (!response.ok) throw new Error('Bad response: ' + response.status);
             const data = await response.json();
             appointmentsData = data || {};
@@ -821,7 +892,7 @@
         const id = e.target.dataset.id;
         const newStatus = e.target.value;
         try {
-            const response = await fetch(`${FIREBASE_DB_URL}/appointments/${id}.json`, {
+            const response = await fetch(dbUrl(`/appointments/${id}.json`), {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
