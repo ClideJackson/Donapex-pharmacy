@@ -24,6 +24,8 @@
 
         * { box-sizing: border-box; }
 
+        html { -webkit-text-size-adjust: 100%; }
+
         body {
             margin: 0;
             background: var(--bg);
@@ -31,6 +33,7 @@
             font-family: 'Inter', sans-serif;
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         h1, h2, h3 {
@@ -56,6 +59,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 12px;
         }
 
         .logo {
@@ -64,6 +68,7 @@
             font-size: 1.3rem;
             letter-spacing: 0.02em;
             color: #FFFFFF;
+            white-space: nowrap;
         }
 
         .logo span { color: var(--accent); }
@@ -76,6 +81,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            flex-shrink: 0;
         }
 
         .back-link:hover { color: var(--accent); }
@@ -83,16 +89,18 @@
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 13px 22px;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 16px;
             border-radius: 999px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             text-decoration: none;
             border: 1px solid transparent;
             cursor: pointer;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
             font-family: 'Inter', sans-serif;
+            white-space: nowrap;
         }
 
         .btn:hover { transform: translateY(-1px); }
@@ -204,7 +212,18 @@
             max-width: 460px;
         }
 
-        .stock-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .stock-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stock-tabs .btn {
+            flex: 1 1 auto;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+        }
 
         .stock-add-form {
             display: grid;
@@ -232,8 +251,14 @@
             overflow: hidden;
         }
 
+        .table-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         table.stock-table {
             width: 100%;
+            min-width: 560px;
             border-collapse: collapse;
             font-size: 0.9rem;
         }
@@ -246,6 +271,7 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
             color: var(--primary-dark);
+            white-space: nowrap;
         }
 
         table.stock-table td {
@@ -273,15 +299,17 @@
             cursor: pointer;
             font-weight: 600;
             line-height: 1;
+            flex-shrink: 0;
         }
 
         .tag {
             display: inline-block;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 600;
-            padding: 2px 8px;
+            padding: 2px 7px;
             border-radius: 999px;
             margin-left: 6px;
+            white-space: nowrap;
         }
 
         .tag.low { background: #C2483A; color: white; }
@@ -295,6 +323,7 @@
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .empty-state {
@@ -309,8 +338,162 @@
             color: #E7F5E2;
         }
 
+        .dashboard-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: box-shadow 0.15s ease, transform 0.15s ease;
+            min-width: 0;
+        }
+        .summary-card:hover {
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+        .summary-card .summary-num {
+            display: block;
+            font-family: 'Fraunces', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .summary-card.has-items .summary-num {
+            color: #C2483A;
+        }
+        .summary-card .summary-label {
+            font-size: 0.8rem;
+            color: var(--ink-soft);
+        }
+        .changed-by {
+            font-size: 0.72rem;
+            color: var(--ink-soft);
+            margin-top: 4px;
+            display: block;
+        }
+
+        .chevron { display: none; }
+        .cell-label { display: none; }
+
+        /* ── Mobile ─────────────────────────────────────────────── */
         @media (max-width: 900px) {
             .stock-add-form { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .wrap { padding: 14px; }
+
+            .staff-header { padding: 12px 14px; }
+            .logo { font-size: 1.05rem; }
+            .back-link { font-size: 0.8rem; }
+            .back-link svg { width: 14px; height: 14px; }
+
+            #loginGate { padding: 14px; }
+            .login-box { padding: 24px 20px; }
+
+            .stock-header { margin-bottom: 16px; }
+            .stock-header .disclaimer { font-size: 0.72rem; max-width: 100%; }
+
+            .dashboard-summary {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+            .summary-card { padding: 10px 12px; }
+            .summary-card .summary-num { font-size: 1.35rem; }
+            .summary-card .summary-label { font-size: 0.7rem; }
+
+            .stock-tabs { gap: 6px; margin-bottom: 14px; }
+            .stock-tabs .btn { padding: 7px 6px; font-size: 0.72rem; }
+
+            .stock-add-form {
+                grid-template-columns: 1fr;
+                padding: 14px;
+                gap: 10px;
+            }
+            .stock-add-form .btn { width: 100%; padding: 10px 16px; font-size: 0.9rem; }
+
+            /* Card view: tables collapse to name + reference, tap to expand */
+            .stock-table thead { display: none; }
+            .stock-table,
+            .stock-table tbody,
+            .stock-table tr,
+            .stock-table td { display: block; width: 100%; }
+            .stock-table { min-width: 0; font-size: 0.85rem; }
+            .table-scroll { overflow-x: visible; }
+
+            .stock-table tbody tr {
+                border-top: 1px solid var(--line);
+                padding: 12px 14px;
+                cursor: pointer;
+            }
+            .stock-table tbody tr:first-child { border-top: none; }
+            .stock-table tbody tr.expired { background: #F5D7D2; }
+            .stock-table tbody tr.low-stock { background: #FDECEA; }
+            .stock-table tbody tr.expiring { background: #FFF8E1; }
+
+            .stock-table td { padding: 0; border-top: none; }
+
+            .stock-table td.cell-primary {
+                font-weight: 600;
+                font-size: 0.92rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+            .stock-table td.cell-primary .chevron {
+                display: inline-block;
+                font-size: 0.7rem;
+                color: var(--ink-soft);
+                transition: transform 0.15s ease;
+                flex-shrink: 0;
+            }
+            .stock-table tr.row-expanded td.cell-primary .chevron { transform: rotate(90deg); }
+
+            .stock-table td.cell-reference {
+                font-size: 0.8rem;
+                color: var(--ink-soft);
+                margin-top: 2px;
+            }
+
+            .stock-table td.cell-secondary {
+                display: none;
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px dashed var(--line);
+            }
+            .stock-table tr.row-expanded td.cell-secondary { display: block; }
+            .stock-table td.cell-secondary ~ td.cell-secondary {
+                border-top: none;
+                padding-top: 0;
+                margin-top: 6px;
+            }
+            .stock-table .cell-label {
+                font-size: 0.66rem;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: var(--ink-soft);
+                display: block;
+                margin-bottom: 2px;
+            }
+            .stock-table td.cell-secondary .qty-controls,
+            .stock-table td.cell-secondary select { margin-top: 2px; }
+
+            .btn { font-size: 0.8rem; padding: 8px 14px; }
+            .staff-user-badge { font-size: 0.75rem; }
+        }
+
+        @media (max-width: 400px) {
+            .dashboard-summary { grid-template-columns: 1fr 1fr; }
+            .stock-tabs { flex-wrap: wrap; }
+            .stock-tabs .btn { flex: 1 1 calc(50% - 6px); }
         }
     </style>
 </head>
@@ -334,7 +517,7 @@
         <div class="modal-error" id="loginError">Incorrect email or password. Please try again.</div>
         <div class="form-row">
             <label for="staffEmail">Email</label>
-            <input type="email" id="staffEmail" placeholder="you@donapex.co.za" autocomplete="username">
+            <input type="email" id="staffEmail" placeholder="you@donapexpharmacy.co.za" autocomplete="username">
         </div>
         <div class="form-row">
             <label for="staffPassword">Password</label>
@@ -358,10 +541,30 @@
             </div>
         </div>
 
-        <div class="stock-tabs" style="display:flex; gap:10px; margin-bottom:20px;">
+        <div class="dashboard-summary" id="dashboardSummary">
+            <div class="summary-card" id="summaryCardOrders">
+                <span class="summary-num" id="summaryOrdersPending">–</span>
+                <span class="summary-label">Pending Orders</span>
+            </div>
+            <div class="summary-card" id="summaryCardAppt">
+                <span class="summary-num" id="summaryApptPending">–</span>
+                <span class="summary-label">Pending Appointments</span>
+            </div>
+            <div class="summary-card" id="summaryCardCallback">
+                <span class="summary-num" id="summaryCallbackPending">–</span>
+                <span class="summary-label">Pending Callbacks</span>
+            </div>
+            <div class="summary-card" id="summaryCardStock">
+                <span class="summary-num" id="summaryStockLow">–</span>
+                <span class="summary-label">Low/Expiring Stock</span>
+            </div>
+        </div>
+
+        <div class="stock-tabs">
             <button class="btn btn-outline" id="tabStockBtn" style="border-color: var(--primary); color: var(--primary-dark);">Stock</button>
             <button class="btn btn-outline" id="tabOrdersBtn" style="border-color: var(--line); color: var(--ink);">Orders</button>
             <button class="btn btn-outline" id="tabApptBtn" style="border-color: var(--line); color: var(--ink);">Appointments</button>
+            <button class="btn btn-outline" id="tabCallbackBtn" style="border-color: var(--line); color: var(--ink);">Callbacks</button>
         </div>
 
         <div id="stockView">
@@ -396,18 +599,20 @@
             </form>
 
             <div class="stock-table-wrap">
-                <table class="stock-table" id="stockTable">
-                    <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Category</th>
-                        <th>Quantity</th>
-                        <th>Expiry</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody id="stockTableBody"></tbody>
-                </table>
+                <div class="table-scroll">
+                    <table class="stock-table" id="stockTable">
+                        <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Category</th>
+                            <th>Expiry</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody id="stockTableBody"></tbody>
+                    </table>
+                </div>
                 <div class="empty-state" id="stockEmptyState" style="display:none;">No stock items yet — add your first one above.</div>
             </div>
         </div>
@@ -415,19 +620,21 @@
         <div id="ordersView" style="display:none;">
             <div class="modal-error" id="ordersLoadError" style="display:none; margin-bottom:16px;">Couldn't reach the orders database. Check your internet connection and try logging out and back in.</div>
             <div class="stock-table-wrap">
-                <table class="stock-table" id="ordersTable">
-                    <thead>
-                    <tr>
-                        <th>Customer</th>
-                        <th>Contact</th>
-                        <th>Order</th>
-                        <th>Method</th>
-                        <th>Status</th>
-                        <th>Placed</th>
-                    </tr>
-                    </thead>
-                    <tbody id="ordersTableBody"></tbody>
-                </table>
+                <div class="table-scroll">
+                    <table class="stock-table" id="ordersTable">
+                        <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Order</th>
+                            <th>Contact</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Placed</th>
+                        </tr>
+                        </thead>
+                        <tbody id="ordersTableBody"></tbody>
+                    </table>
+                </div>
                 <div class="empty-state" id="ordersEmptyState" style="display:none;">No orders yet.</div>
             </div>
         </div>
@@ -437,20 +644,46 @@
                 Couldn't reach the appointments database. Check your internet connection and try logging out and back in.
             </div>
             <div class="stock-table-wrap">
-                <table class="stock-table" id="apptTable">
-                    <thead>
-                    <tr>
-                        <th>Customer</th>
-                        <th>Contact</th>
-                        <th>Service</th>
-                        <th>Date & Time</th>
-                        <th>Status</th>
-                        <th>Requested</th>
-                    </tr>
-                    </thead>
-                    <tbody id="apptTableBody"></tbody>
-                </table>
+                <div class="table-scroll">
+                    <table class="stock-table" id="apptTable">
+                        <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Date & Time</th>
+                            <th>Contact</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                            <th>Requested</th>
+                        </tr>
+                        </thead>
+                        <tbody id="apptTableBody"></tbody>
+                    </table>
+                </div>
                 <div class="empty-state" id="apptEmptyState" style="display:none;">No appointments yet.</div>
+            </div>
+        </div>
+
+        <div id="callbackView" style="display:none;">
+            <div class="modal-error" id="callbackLoadError" style="display:none; margin-bottom:16px;">
+                Couldn't reach the callbacks database. Check your internet connection and try logging out and back in.
+            </div>
+            <div class="stock-table-wrap">
+                <div class="table-scroll">
+                    <table class="stock-table" id="callbackTable">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Reason</th>
+                            <th>Phone</th>
+                            <th>Note</th>
+                            <th>Status</th>
+                            <th>Requested</th>
+                        </tr>
+                        </thead>
+                        <tbody id="callbackTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="callbackEmptyState" style="display:none;">No callback requests yet.</div>
             </div>
         </div>
     </div>
@@ -536,6 +769,12 @@
             stockPanel.style.display = 'block';
             staffUserBadge.textContent = user.email || '';
             loadStock();
+            loadDashboardCounts();
+
+            document.getElementById('summaryCardOrders').addEventListener('click', () => tabOrdersBtn.click());
+            document.getElementById('summaryCardAppt').addEventListener('click', () => tabApptBtn.click());
+            document.getElementById('summaryCardCallback').addEventListener('click', () => tabCallbackBtn.click());
+            document.getElementById('summaryCardStock').addEventListener('click', () => tabStockBtn.click());
         } else {
             currentIdToken = null;
             stockPanel.style.display = 'none';
@@ -588,13 +827,35 @@
         stockView.style.display = 'none';
         ordersView.style.display = 'none';
         apptView.style.display = 'block';
+        callbackView.style.display = 'none';
         tabApptBtn.style.borderColor = 'var(--primary)';
         tabApptBtn.style.color = 'var(--primary-dark)';
         tabStockBtn.style.borderColor = 'var(--line)';
         tabStockBtn.style.color = 'var(--ink)';
         tabOrdersBtn.style.borderColor = 'var(--line)';
         tabOrdersBtn.style.color = 'var(--ink)';
+        tabCallbackBtn.style.borderColor = 'var(--line)';
+        tabCallbackBtn.style.color = 'var(--ink)';
         loadAppointments();
+    });
+
+    const tabCallbackBtn = document.getElementById('tabCallbackBtn');
+    const callbackView = document.getElementById('callbackView');
+
+    tabCallbackBtn.addEventListener('click', () => {
+        stockView.style.display = 'none';
+        ordersView.style.display = 'none';
+        apptView.style.display = 'none';
+        callbackView.style.display = 'block';
+        tabCallbackBtn.style.borderColor = 'var(--primary)';
+        tabCallbackBtn.style.color = 'var(--primary-dark)';
+        tabStockBtn.style.borderColor = 'var(--line)';
+        tabStockBtn.style.color = 'var(--ink)';
+        tabOrdersBtn.style.borderColor = 'var(--line)';
+        tabOrdersBtn.style.color = 'var(--ink)';
+        tabApptBtn.style.borderColor = 'var(--line)';
+        tabApptBtn.style.color = 'var(--ink)';
+        loadCallbacks();
     });
 
     // ── Stock ──────────────────────────────────────────────────────
@@ -672,21 +933,21 @@
             else if (isExpiring) row.classList.add('expiring');
 
             row.innerHTML = `
-        <td>${escapeHtml(item.name)}
+        <td class="cell-primary"><span>${escapeHtml(item.name)}
           ${isExpired ? '<span class="tag expired">Expired</span>' : ''}
           ${!isExpired && isLow ? '<span class="tag low">Low stock</span>' : ''}
           ${!isExpired && isExpiring ? '<span class="tag exp">Expiring soon</span>' : ''}
-        </td>
-        <td>${escapeHtml(item.category || '—')}</td>
-        <td>
+        </span><span class="chevron">▶</span></td>
+        <td class="cell-reference">
           <div class="qty-controls">
             <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
             <span>${item.qty}</span>
             <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
           </div>
         </td>
-        <td>${item.expiry || '—'}</td>
-        <td><button class="del-btn" data-action="del" data-idx="${idx}">Remove</button></td>
+        <td class="cell-secondary"><span class="cell-label">Category</span>${escapeHtml(item.category || '—')}</td>
+        <td class="cell-secondary"><span class="cell-label">Expiry</span>${item.expiry || '—'}</td>
+        <td class="cell-secondary"><button class="del-btn" data-action="del" data-idx="${idx}">Remove</button></td>
       `;
             tbody.appendChild(row);
         });
@@ -742,36 +1003,48 @@
             const placed = o.createdAt ? new Date(o.createdAt).toLocaleString() : '—';
 
             row.innerHTML = `
-                <td>${escapeHtml(o.customerName || '—')}</td>
-                <td>${escapeHtml(o.phone || '—')}${o.email ? '<br>' + escapeHtml(o.email) : ''}</td>
-                <td>${escapeHtml(o.orderType || '—')}<br><span style="font-size:0.85em;color:var(--ink-soft);">${escapeHtml(o.medicine || '')}</span></td>
-                <td>${escapeHtml(o.collectionMethod || '—')}</td>
-                <td>
+                <td class="cell-primary"><span>${escapeHtml(o.customerName || '—')}</span><span class="chevron">▶</span></td>
+                <td class="cell-reference">${escapeHtml(o.orderType || '—')}${o.medicine ? ' · ' + escapeHtml(o.medicine) : ''}</td>
+                <td class="cell-secondary"><span class="cell-label">Contact</span>${escapeHtml(o.phone || '—')}${o.email ? '<br>' + escapeHtml(o.email) : ''}</td>
+                <td class="cell-secondary"><span class="cell-label">Method</span>${escapeHtml(o.collectionMethod || '—')}</td>
+                <td class="cell-secondary">
+                  <span class="cell-label">Status</span>
                   <select class="order-status-select" data-id="${id}">
                     <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
                     <option value="Approved" ${o.status === 'Approved' ? 'selected' : ''}>Approved</option>
                     <option value="Ready" ${o.status === 'Ready' ? 'selected' : ''}>Ready</option>
                     <option value="Collected" ${o.status === 'Collected' ? 'selected' : ''}>Collected</option>
                   </select>
+                  ${o.changedBy ? `<span class="changed-by">by ${escapeHtml(o.changedBy)}</span>` : ''}
                 </td>
-                <td style="font-size:0.85em;">${placed}</td>
+                <td class="cell-secondary"><span class="cell-label">Placed</span>${placed}</td>
             `;
             tbody.appendChild(row);
         });
     }
 
+    document.getElementById('ordersTableBody').addEventListener('click', (e) => {
+        if (e.target.closest('select')) return;
+        const tr = e.target.closest('tr');
+        if (tr) tr.classList.toggle('row-expanded');
+    });
+
     document.getElementById('ordersTableBody').addEventListener('change', async (e) => {
         if (!e.target.classList.contains('order-status-select')) return;
         const id = e.target.dataset.id;
         const newStatus = e.target.value;
+        const changedBy = auth.currentUser ? auth.currentUser.email : 'unknown';
         try {
             const response = await fetch(dbUrl(`/orders/${id}.json`), {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({status: newStatus})
+                body: JSON.stringify({status: newStatus, changedBy, changedAt: new Date().toISOString()})
             });
             if (!response.ok) throw new Error('Bad response: ' + response.status);
             ordersData[id].status = newStatus;
+            ordersData[id].changedBy = changedBy;
+            renderOrders();
+            loadDashboardCounts();
         } catch (err) {
             console.error('Failed to update order status', err);
             const errorBox = document.getElementById('ordersLoadError');
@@ -782,7 +1055,11 @@
 
     document.getElementById('stockTableBody').addEventListener('click', (e) => {
         const btn = e.target.closest('button');
-        if (!btn) return;
+        if (!btn) {
+            const tr = e.target.closest('tr');
+            if (tr) tr.classList.toggle('row-expanded');
+            return;
+        }
         const idx = parseInt(btn.dataset.idx, 10);
         const action = btn.dataset.action;
 
@@ -869,41 +1146,203 @@
             const requested = a.createdAt ? new Date(a.createdAt).toLocaleString() : '—';
 
             row.innerHTML = `
-            <td>${escapeHtml(a.customerName || '—')}</td>
-            <td>${escapeHtml(a.phone || '—')}</td>
-            <td>${escapeHtml(a.service || '—')}</td>
-            <td>${escapeHtml(a.date || '—')} · ${escapeHtml(a.time || '—')}</td>
-            <td>
+            <td class="cell-primary"><span>${escapeHtml(a.customerName || '—')}</span><span class="chevron">▶</span></td>
+            <td class="cell-reference">${escapeHtml(a.date || '—')} · ${escapeHtml(a.time || '—')}</td>
+            <td class="cell-secondary"><span class="cell-label">Contact</span>${escapeHtml(a.phone || '—')}</td>
+            <td class="cell-secondary"><span class="cell-label">Service</span>${escapeHtml(a.service || '—')}</td>
+            <td class="cell-secondary">
+              <span class="cell-label">Status</span>
               <select class="appt-status-select" data-id="${id}">
                 <option value="Pending" ${a.status === 'Pending' ? 'selected' : ''}>Pending</option>
                 <option value="Confirmed" ${a.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
                 <option value="Completed" ${a.status === 'Completed' ? 'selected' : ''}>Completed</option>
                 <option value="Cancelled" ${a.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
               </select>
+              ${a.changedBy ? `<span class="changed-by">by ${escapeHtml(a.changedBy)}</span>` : ''}
             </td>
-            <td style="font-size:0.85em;">${requested}</td>
+            <td class="cell-secondary"><span class="cell-label">Requested</span>${requested}</td>
         `;
             tbody.appendChild(row);
         });
     }
 
+    document.getElementById('apptTableBody').addEventListener('click', (e) => {
+        if (e.target.closest('select')) return;
+        const tr = e.target.closest('tr');
+        if (tr) tr.classList.toggle('row-expanded');
+    });
+
     document.getElementById('apptTableBody').addEventListener('change', async (e) => {
+
         if (!e.target.classList.contains('appt-status-select')) return;
         const id = e.target.dataset.id;
         const newStatus = e.target.value;
+        const changedBy = auth.currentUser ? auth.currentUser.email : 'unknown';
         try {
             const response = await fetch(dbUrl(`/appointments/${id}.json`), {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
+                body: JSON.stringify({ status: newStatus, changedBy, changedAt: new Date().toISOString() })
             });
             if (!response.ok) throw new Error('Bad response: ' + response.status);
             appointmentsData[id].status = newStatus;
+
+            appointmentsData[id].changedBy = changedBy;
+            renderAppointments();
+            loadDashboardCounts();
         } catch (err) {
             console.error('Failed to update appointment status', err);
         }
     });
-</script>
 
+    // ── Callbacks ──────────────────────────────────────────────────
+    let callbacksData = {};
+
+    async function loadCallbacks() {
+        const errorBox = document.getElementById('callbackLoadError');
+        errorBox.style.display = 'none';
+        const emptyState = document.getElementById('callbackEmptyState');
+        emptyState.textContent = 'Loading callback requests…';
+        emptyState.style.display = 'block';
+        try {
+            const response = await fetch(dbUrl('/callbacks.json'));
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            const data = await response.json();
+            callbacksData = data || {};
+        } catch (err) {
+            console.error('Failed to load callbacks', err);
+            callbacksData = {};
+            errorBox.style.display = 'block';
+        }
+        emptyState.textContent = 'No callback requests yet.';
+        renderCallbacks();
+    }
+
+    function renderCallbacks() {
+        const tbody = document.getElementById('callbackTableBody');
+        const emptyState = document.getElementById('callbackEmptyState');
+        tbody.innerHTML = '';
+
+        const ids = Object.keys(callbacksData).sort((a, b) => {
+            return (callbacksData[b].createdAt || '').localeCompare(callbacksData[a].createdAt || '');
+        });
+
+        if (ids.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        ids.forEach(id => {
+            const c = callbacksData[id];
+            const row = document.createElement('tr');
+            const requested = c.createdAt ? new Date(c.createdAt).toLocaleString() : '—';
+
+            row.innerHTML = `
+            <td class="cell-primary"><span>${escapeHtml(c.firstName || '')} ${escapeHtml(c.lastName || '')}</span><span class="chevron">▶</span></td>
+            <td class="cell-reference">${escapeHtml(c.reason || '—')}</td>
+            <td class="cell-secondary"><span class="cell-label">Phone</span>${escapeHtml(c.phone || '—')}</td>
+            <td class="cell-secondary"><span class="cell-label">Note</span>${escapeHtml(c.note || '—')}</td>
+            <td class="cell-secondary">
+              <span class="cell-label">Status</span>
+              <select class="callback-status-select" data-id="${id}">
+                <option value="Pending" ${c.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                <option value="Called" ${c.status === 'Called' ? 'selected' : ''}>Called</option>
+                <option value="Done" ${c.status === 'Done' ? 'selected' : ''}>Done</option>
+              </select>
+              ${c.changedBy ? `<span class="changed-by">by ${escapeHtml(c.changedBy)}</span>` : ''}
+            </td>
+            <td class="cell-secondary"><span class="cell-label">Requested</span>${requested}</td>
+        `;
+            tbody.appendChild(row);
+        });
+    }
+
+    document.getElementById('callbackTableBody').addEventListener('click', (e) => {
+        if (e.target.closest('select')) return;
+        const tr = e.target.closest('tr');
+        if (tr) tr.classList.toggle('row-expanded');
+    });
+
+    document.getElementById('callbackTableBody').addEventListener('change', async (e) => {
+        if (!e.target.classList.contains('callback-status-select')) return;
+        const id = e.target.dataset.id;
+        const newStatus = e.target.value;
+        const changedBy = auth.currentUser ? auth.currentUser.email : 'unknown';
+        try {
+            const response = await fetch(dbUrl(`/callbacks/${id}.json`), {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus, changedBy, changedAt: new Date().toISOString() })
+            });
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            callbacksData[id].status = newStatus;
+            callbacksData[id].changedBy = changedBy;
+            renderCallbacks();
+            loadDashboardCounts();
+        } catch (err) {
+            console.error('Failed to update callback status', err);
+            const errorBox = document.getElementById('callbackLoadError');
+            errorBox.textContent = "Couldn't save that status change. Check your internet connection.";
+            errorBox.style.display = 'block';
+        }
+    });
+
+    async function loadDashboardCounts() {
+        try {
+            const [ordersRes, apptRes, cbRes, stockRes] = await Promise.all([
+                fetch(dbUrl('/orders.json')),
+                fetch(dbUrl('/appointments.json')),
+                fetch(dbUrl('/callbacks.json')),
+                fetch(dbUrl('/stock.json'))
+            ]);
+            const [ordersJson, apptJson, cbJson, stockJson] = await Promise.all([
+                ordersRes.ok ? ordersRes.json() : {},
+                apptRes.ok ? apptRes.json() : {},
+                cbRes.ok ? cbRes.json() : {},
+                stockRes.ok ? stockRes.json() : []
+            ]);
+
+            const ordersArr = Object.values(ordersJson || {});
+            const apptArr = Object.values(apptJson || {});
+            const cbArr = Object.values(cbJson || {});
+            const stockArr = Array.isArray(stockJson) ? stockJson.filter(Boolean) : Object.values(stockJson || {});
+
+            const pendingOrders = ordersArr.filter(o => o.status === 'Pending').length;
+            const pendingAppt = apptArr.filter(a => a.status === 'Pending').length;
+            const pendingCb = cbArr.filter(c => c.status === 'Pending').length;
+
+            const now = new Date();
+            const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const soon = new Date(todayMidnight);
+            soon.setDate(todayMidnight.getDate() + 30);
+
+            const lowOrExpiringStock = stockArr.filter(item => {
+                const isLow = item.threshold != null && item.qty <= item.threshold;
+                let isExpiringOrExpired = false;
+                if (item.expiry) {
+                    const [y, m, d] = item.expiry.split('-').map(Number);
+                    const expiryDate = new Date(y, m - 1, d);
+                    if (expiryDate <= soon) isExpiringOrExpired = true;
+                }
+                return isLow || isExpiringOrExpired;
+            }).length;
+
+            setSummary('summaryOrdersPending', pendingOrders, 'summaryCardOrders');
+            setSummary('summaryApptPending', pendingAppt, 'summaryCardAppt');
+            setSummary('summaryCallbackPending', pendingCb, 'summaryCardCallback');
+            setSummary('summaryStockLow', lowOrExpiringStock, 'summaryCardStock');
+        } catch (err) {
+            console.error('Failed to load dashboard counts', err);
+        }
+    }
+
+    function setSummary(numId, count, cardId) {
+        document.getElementById(numId).textContent = count;
+        const cardEl = document.getElementById(cardId);
+        if (count > 0) cardEl.classList.add('has-items');
+        else cardEl.classList.remove('has-items');
+    }
+</script>
 </body>
 </html>

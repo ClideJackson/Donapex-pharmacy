@@ -500,6 +500,16 @@
             border-bottom: 1px solid #ececec;
         }
 
+        .contact-item > div:last-child {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .contact-item .txt-value {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
         .contact-item:last-child {
             border-bottom: none;
         }
@@ -1332,6 +1342,17 @@
             }
         }
 
+        .callback-status-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+        .callback-status-badge.Pending { background: #FFF8E1; color: #8A6D00; }
+        .callback-status-badge.Called { background: #E1F0FF; color: #0A5EA8; }
+        .callback-status-badge.Done { background: var(--panel); color: var(--primary-dark); }
+
     </style>
 </head>
 <body>
@@ -1425,6 +1446,9 @@
                 <a href="https://wa.me/27715737749" class="btn btn-primary" target="_blank">
                     WhatsApp Us
                 </a>
+                <button type="button" class="btn btn-primary" id="callbackBtn">
+                    Request a Callback
+                </button>
             </div>
         </div>
     </div>
@@ -1846,6 +1870,46 @@
     </div>
 </div>
 
+<!-- Request a Callback modal -->
+<div class="modal-overlay" id="callbackModal">
+    <div class="modal-box">
+        <button class="modal-close-x" id="closeCallbackModal">&times;</button>
+        <h3>Request a Callback</h3>
+        <p class="sub">Leave your details and we'll call you back as soon as we can.</p>
+        <div class="modal-error" id="callbackError">Please fill in your name, surname, and phone number.</div>
+        <div class="form-success" id="callbackSuccess" style="display:block;">Thanks! We've got your details and will call you back soon.</div>
+
+        <form id="callbackForm">
+            <div class="form-row">
+                <label for="cbFirstName">First name</label>
+                <input type="text" id="cbFirstName" placeholder="Jane">
+            </div>
+            <div class="form-row">
+                <label for="cbLastName">Surname</label>
+                <input type="text" id="cbLastName" placeholder="Smith">
+            </div>
+            <div class="form-row">
+                <label for="cbPhone">Phone number</label>
+                <input type="tel" id="cbPhone" placeholder="082 123 4567">
+            </div>
+            <div class="form-row">
+                <label for="cbReason">What's this about?</label>
+                <select id="cbReason">
+                    <option>General enquiry</option>
+                    <option>Prescription question</option>
+                    <option>Stock availability</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="cbNote">Anything else? (optional)</label>
+                <textarea id="cbNote" placeholder="e.g. medicine name, best time to reach you"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="cbSubmitBtn" style="width:100%; justify-content:center;">Request Callback</button>
+        </form>
+    </div>
+</div>
+
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -2045,6 +2109,86 @@
         } finally {
             trackOrderBtn.disabled = false;
             trackOrderBtn.textContent = 'Look Up My Order';
+        }
+    });
+
+    /* Request a Callback */
+    const CALLBACK_URL = 'https://donapex-pharmacy-default-rtdb.europe-west1.firebasedatabase.app/callbacks.json';
+
+    const callbackBtn = document.getElementById('callbackBtn');
+    const callbackModal = document.getElementById('callbackModal');
+    const closeCallbackModal = document.getElementById('closeCallbackModal');
+    const callbackForm = document.getElementById('callbackForm');
+    const callbackError = document.getElementById('callbackError');
+    const callbackSuccess = document.getElementById('callbackSuccess');
+    const cbSubmitBtn = document.getElementById('cbSubmitBtn');
+
+    callbackBtn.addEventListener('click', () => {
+        callbackModal.classList.add('open');
+        callbackError.style.display = 'none';
+        callbackSuccess.style.display = 'none';
+        callbackForm.style.display = 'block';
+    });
+
+    closeCallbackModal.addEventListener('click', () => {
+        callbackModal.classList.remove('open');
+    });
+
+    callbackModal.addEventListener('click', (e) => {
+        if (e.target === callbackModal) callbackModal.classList.remove('open');
+    });
+
+    callbackForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        callbackError.style.display = 'none';
+
+        const firstName = document.getElementById('cbFirstName').value.trim();
+        const lastName = document.getElementById('cbLastName').value.trim();
+        const phone = document.getElementById('cbPhone').value.trim();
+        const reason = document.getElementById('cbReason').value;
+        const note = document.getElementById('cbNote').value.trim();
+
+        if (!firstName || !lastName || !phone) {
+            callbackError.style.display = 'block';
+            return;
+        }
+
+        cbSubmitBtn.disabled = true;
+        cbSubmitBtn.textContent = 'Sending…';
+
+        try {
+            // Save to Firebase so staff can see/manage it in staff.html
+            const response = await fetch(CALLBACK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firstName, lastName, phone, reason, note,
+                    status: 'Pending',
+                    createdAt: new Date().toISOString()
+                })
+            });
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+
+            // Also send to Formspree so you get an email notification.
+            // Fire-and-forget: if this fails, the request is still safely saved above.
+            fetch(FORMSPREE_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    _subject: `New callback request: ${firstName} ${lastName}`,
+                    firstName, lastName, phone, reason, note
+                })
+            }).catch(err => console.error('Formspree notification failed (non-critical)', err));
+
+            callbackForm.style.display = 'none';
+            callbackSuccess.style.display = 'block';
+        } catch (err) {
+            console.error('Failed to submit callback request', err);
+            callbackError.textContent = "Couldn't send your request. Please check your internet connection, or just WhatsApp/call us directly.";
+            callbackError.style.display = 'block';
+        } finally {
+            cbSubmitBtn.disabled = false;
+            cbSubmitBtn.textContent = 'Request Callback';
         }
     });
 </script>
