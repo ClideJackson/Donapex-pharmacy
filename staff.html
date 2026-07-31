@@ -1092,6 +1092,8 @@
                     <option value="Approved" ${o.status === 'Approved' ? 'selected' : ''}>Approved</option>
                     <option value="Ready" ${o.status === 'Ready' ? 'selected' : ''}>Ready</option>
                     <option value="Collected" ${o.status === 'Collected' ? 'selected' : ''}>Collected</option>
+                    <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                    <option value="Scheduled for Delivery" ${o.status === 'Scheduled for Delivery' ? 'selected' : ''}>Scheduled for Delivery</option>
                   </select>
                   ${o.changedBy ? `<span class="changed-by">by ${escapeHtml(o.changedBy)}</span>` : ''}
                 </td>
