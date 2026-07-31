@@ -495,6 +495,40 @@
             .stock-tabs { flex-wrap: wrap; }
             .stock-tabs .btn { flex: 1 1 calc(50% - 6px); }
         }
+
+        /*sales*/
+
+        .sale-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            align-items: end;
+        }
+        .sale-form .field label {
+            font-size: 0.78rem;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+            display: block;
+        }
+        .today-sales-banner {
+            background: var(--panel);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        @media (max-width: 900px) {
+            .sale-form { grid-template-columns: 1fr 1fr; }
+        }
+
     </style>
 </head>
 <body>
@@ -558,6 +592,10 @@
                 <span class="summary-num" id="summaryStockLow">–</span>
                 <span class="summary-label">Low/Expiring Stock</span>
             </div>
+            <div class="summary-card" id="summaryCardSales">
+                <span class="summary-num" id="summaryTodaySales">–</span>
+                <span class="summary-label">Today's Sales (R)</span>
+            </div>
         </div>
 
         <div class="stock-tabs">
@@ -565,6 +603,7 @@
             <button class="btn btn-outline" id="tabOrdersBtn" style="border-color: var(--line); color: var(--ink);">Orders</button>
             <button class="btn btn-outline" id="tabApptBtn" style="border-color: var(--line); color: var(--ink);">Appointments</button>
             <button class="btn btn-outline" id="tabCallbackBtn" style="border-color: var(--line); color: var(--ink);">Callbacks</button>
+            <button class="btn btn-outline" id="tabSalesBtn" style="border-color: var(--line); color: var(--ink);">Sales</button>
         </div>
 
         <div id="stockView">
@@ -686,6 +725,49 @@
                 <div class="empty-state" id="callbackEmptyState" style="display:none;">No callback requests yet.</div>
             </div>
         </div>
+
+        <div id="salesView" style="display:none;">
+            <div class="today-sales-banner" id="todaySalesBanner">Today's Sales: R0.00</div>
+            <div class="modal-error" id="saleFormError" style="display:none; margin-bottom:16px;"></div>
+            <form class="sale-form" id="recordSaleForm">
+                <div class="field">
+                    <label for="saleItemSelect">Item sold</label>
+                    <select id="saleItemSelect">
+                        <option value="">-- Select from stock --</option>
+                    </select>
+                    <input type="text" id="saleItemCustom" placeholder="Or type item name" style="margin-top:6px;">
+                </div>
+                <div class="field">
+                    <label for="saleQty">Quantity</label>
+                    <input type="number" id="saleQty" min="1" placeholder="1">
+                </div>
+                <div class="field">
+                    <label for="saleUnitPrice">Unit price (R)</label>
+                    <input type="number" id="saleUnitPrice" min="0" step="0.01" placeholder="0.00">
+                </div>
+                <button type="submit" class="btn btn-primary">Record Sale</button>
+            </form>
+
+            <div class="modal-error" id="salesLoadError" style="display:none; margin-bottom:16px;">Couldn't reach the sales database. Check your internet connection and try logging out and back in.</div>
+            <div class="stock-table-wrap">
+                <div class="table-scroll">
+                    <table class="stock-table" id="salesTable">
+                        <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                            <th>Sold By</th>
+                            <th>When</th>
+                        </tr>
+                        </thead>
+                        <tbody id="salesTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="salesEmptyState" style="display:none;">No sales recorded yet.</div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -734,6 +816,10 @@
     const stockView = document.getElementById('stockView');
     const ordersView = document.getElementById('ordersView');
     const apptView = document.getElementById('apptView');
+    const tabCallbackBtn = document.getElementById('tabCallbackBtn');
+    const callbackView = document.getElementById('callbackView');
+    const tabSalesBtn = document.getElementById('tabSalesBtn');
+    const salesView = document.getElementById('salesView');
 
     // ── Auth wiring ────────────────────────────────────────────────
     async function handleLogin() {
@@ -775,6 +861,7 @@
             document.getElementById('summaryCardAppt').addEventListener('click', () => tabApptBtn.click());
             document.getElementById('summaryCardCallback').addEventListener('click', () => tabCallbackBtn.click());
             document.getElementById('summaryCardStock').addEventListener('click', () => tabStockBtn.click());
+            document.getElementById('summaryCardSales').addEventListener('click', () => tabSalesBtn.click());
         } else {
             currentIdToken = null;
             stockPanel.style.display = 'none';
@@ -798,64 +885,55 @@
         return currentIdToken ? `${base}?auth=${currentIdToken}` : base;
     }
 
-    tabStockBtn.addEventListener('click', () => {
-        stockView.style.display = 'block';
+    function resetTabStyles() {
+        [ [tabStockBtn], [tabOrdersBtn], [tabApptBtn], [tabCallbackBtn], [tabSalesBtn] ].forEach(([btn]) => {
+            btn.style.borderColor = 'var(--line)';
+            btn.style.color = 'var(--ink)';
+        });
+        stockView.style.display = 'none';
         ordersView.style.display = 'none';
         apptView.style.display = 'none';
-        tabStockBtn.style.borderColor = 'var(--primary)';
-        tabStockBtn.style.color = 'var(--primary-dark)';
-        tabOrdersBtn.style.borderColor = 'var(--line)';
-        tabOrdersBtn.style.color = 'var(--ink)';
-        tabApptBtn.style.borderColor = 'var(--line)';
-        tabApptBtn.style.color = 'var(--ink)';
+        callbackView.style.display = 'none';
+        salesView.style.display = 'none';
+    }
+
+    function activateTab(btn) {
+        btn.style.borderColor = 'var(--primary)';
+        btn.style.color = 'var(--primary-dark)';
+    }
+
+    tabStockBtn.addEventListener('click', () => {
+        resetTabStyles();
+        stockView.style.display = 'block';
+        activateTab(tabStockBtn);
     });
 
     tabOrdersBtn.addEventListener('click', () => {
-        stockView.style.display = 'none';
+        resetTabStyles();
         ordersView.style.display = 'block';
-        apptView.style.display = 'none';
-        tabOrdersBtn.style.borderColor = 'var(--primary)';
-        tabOrdersBtn.style.color = 'var(--primary-dark)';
-        tabStockBtn.style.borderColor = 'var(--line)';
-        tabStockBtn.style.color = 'var(--ink)';
-        tabApptBtn.style.borderColor = 'var(--line)';
-        tabApptBtn.style.color = 'var(--ink)';
+        activateTab(tabOrdersBtn);
         loadOrders();
     });
 
     tabApptBtn.addEventListener('click', () => {
-        stockView.style.display = 'none';
-        ordersView.style.display = 'none';
+        resetTabStyles();
         apptView.style.display = 'block';
-        callbackView.style.display = 'none';
-        tabApptBtn.style.borderColor = 'var(--primary)';
-        tabApptBtn.style.color = 'var(--primary-dark)';
-        tabStockBtn.style.borderColor = 'var(--line)';
-        tabStockBtn.style.color = 'var(--ink)';
-        tabOrdersBtn.style.borderColor = 'var(--line)';
-        tabOrdersBtn.style.color = 'var(--ink)';
-        tabCallbackBtn.style.borderColor = 'var(--line)';
-        tabCallbackBtn.style.color = 'var(--ink)';
+        activateTab(tabApptBtn);
         loadAppointments();
     });
 
-    const tabCallbackBtn = document.getElementById('tabCallbackBtn');
-    const callbackView = document.getElementById('callbackView');
-
     tabCallbackBtn.addEventListener('click', () => {
-        stockView.style.display = 'none';
-        ordersView.style.display = 'none';
-        apptView.style.display = 'none';
+        resetTabStyles();
         callbackView.style.display = 'block';
-        tabCallbackBtn.style.borderColor = 'var(--primary)';
-        tabCallbackBtn.style.color = 'var(--primary-dark)';
-        tabStockBtn.style.borderColor = 'var(--line)';
-        tabStockBtn.style.color = 'var(--ink)';
-        tabOrdersBtn.style.borderColor = 'var(--line)';
-        tabOrdersBtn.style.color = 'var(--ink)';
-        tabApptBtn.style.borderColor = 'var(--line)';
-        tabApptBtn.style.color = 'var(--ink)';
+        activateTab(tabCallbackBtn);
         loadCallbacks();
+    });
+
+    tabSalesBtn.addEventListener('click', () => {
+        resetTabStyles();
+        salesView.style.display = 'block';
+        activateTab(tabSalesBtn);
+        loadSales();
     });
 
     // ── Stock ──────────────────────────────────────────────────────
@@ -1290,18 +1368,28 @@
 
     async function loadDashboardCounts() {
         try {
-            const [ordersRes, apptRes, cbRes, stockRes] = await Promise.all([
+            const [ordersRes, apptRes, cbRes, stockRes, salesRes] = await Promise.all([
                 fetch(dbUrl('/orders.json')),
                 fetch(dbUrl('/appointments.json')),
                 fetch(dbUrl('/callbacks.json')),
-                fetch(dbUrl('/stock.json'))
+                fetch(dbUrl('/stock.json')),
+                fetch(dbUrl('/sales.json'))
             ]);
-            const [ordersJson, apptJson, cbJson, stockJson] = await Promise.all([
+            const [ordersJson, apptJson, cbJson, stockJson, salesJson] = await Promise.all([
                 ordersRes.ok ? ordersRes.json() : {},
                 apptRes.ok ? apptRes.json() : {},
                 cbRes.ok ? cbRes.json() : {},
-                stockRes.ok ? stockRes.json() : []
+                stockRes.ok ? stockRes.json() : [],
+                salesRes.ok ? salesRes.json() : {}
             ]);
+
+            const salesArr = Object.values(salesJson || {});
+            const todayStr = new Date().toDateString();
+            const todayTotal = salesArr.reduce((sum, s) => {
+                if (s.createdAt && new Date(s.createdAt).toDateString() === todayStr) return sum + (s.total || 0);
+                return sum;
+            }, 0);
+            document.getElementById('summaryTodaySales').textContent = `R${todayTotal.toFixed(2)}`;
 
             const ordersArr = Object.values(ordersJson || {});
             const apptArr = Object.values(apptJson || {});
@@ -1343,6 +1431,145 @@
         if (count > 0) cardEl.classList.add('has-items');
         else cardEl.classList.remove('has-items');
     }
+
+    // ── Sales ──────────────────────────────────────────────────────
+    let salesData = {};
+
+    function populateSaleItemDropdown() {
+        const select = document.getElementById('saleItemSelect');
+        const current = select.value;
+        select.innerHTML = '<option value="">-- Select from stock --</option>';
+        stockItems.forEach((item, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `${item.name} (${item.qty} in stock)`;
+            select.appendChild(opt);
+        });
+        select.value = current;
+    }
+
+    async function loadSales() {
+        const errorBox = document.getElementById('salesLoadError');
+        errorBox.style.display = 'none';
+        const emptyState = document.getElementById('salesEmptyState');
+        emptyState.textContent = 'Loading sales…';
+        emptyState.style.display = 'block';
+        try {
+            const response = await fetch(dbUrl('/sales.json'));
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+            const data = await response.json();
+            salesData = data || {};
+        } catch (err) {
+            console.error('Failed to load sales', err);
+            salesData = {};
+            errorBox.style.display = 'block';
+        }
+        emptyState.textContent = 'No sales recorded yet.';
+        populateSaleItemDropdown();
+        renderSales();
+    }
+
+    function renderSales() {
+        const tbody = document.getElementById('salesTableBody');
+        const emptyState = document.getElementById('salesEmptyState');
+        tbody.innerHTML = '';
+
+        const ids = Object.keys(salesData).sort((a, b) => {
+            return (salesData[b].createdAt || '').localeCompare(salesData[a].createdAt || '');
+        });
+
+        if (ids.length === 0) {
+            emptyState.style.display = 'block';
+        } else {
+            emptyState.style.display = 'none';
+            ids.forEach(id => {
+                const s = salesData[id];
+                const row = document.createElement('tr');
+                const when = s.createdAt ? new Date(s.createdAt).toLocaleString() : '—';
+                row.innerHTML = `
+                <td>${escapeHtml(s.itemName || '—')}</td>
+                <td>${s.qty ?? '—'}</td>
+                <td>R${(s.unitPrice ?? 0).toFixed(2)}</td>
+                <td>R${(s.total ?? 0).toFixed(2)}</td>
+                <td style="font-size:0.85em; color:var(--ink-soft);">${escapeHtml(s.soldBy || '—')}</td>
+                <td style="font-size:0.85em;">${when}</td>
+            `;
+                tbody.appendChild(row);
+            });
+        }
+
+        const todayStr = new Date().toDateString();
+        const todayTotal = Object.values(salesData).reduce((sum, s) => {
+            if (s.createdAt && new Date(s.createdAt).toDateString() === todayStr) {
+                return sum + (s.total || 0);
+            }
+            return sum;
+        }, 0);
+        document.getElementById('todaySalesBanner').textContent = `Today's Sales: R${todayTotal.toFixed(2)}`;
+    }
+
+    document.getElementById('recordSaleForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorBox = document.getElementById('saleFormError');
+        errorBox.style.display = 'none';
+
+        const selectEl = document.getElementById('saleItemSelect');
+        const customName = document.getElementById('saleItemCustom').value.trim();
+        const qtyRaw = document.getElementById('saleQty').value;
+        const priceRaw = document.getElementById('saleUnitPrice').value;
+
+        const stockIdx = selectEl.value !== '' ? parseInt(selectEl.value, 10) : null;
+        const itemName = stockIdx !== null ? stockItems[stockIdx].name : customName;
+
+        if (!itemName) {
+            errorBox.textContent = 'Please select a stock item or type an item name.';
+            errorBox.style.display = 'block';
+            return;
+        }
+        if (!qtyRaw || isNaN(parseInt(qtyRaw, 10)) || parseInt(qtyRaw, 10) <= 0) {
+            errorBox.textContent = 'Please enter a valid quantity.';
+            errorBox.style.display = 'block';
+            return;
+        }
+        if (priceRaw === '' || isNaN(parseFloat(priceRaw)) || parseFloat(priceRaw) < 0) {
+            errorBox.textContent = 'Please enter a valid unit price.';
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        const qty = parseInt(qtyRaw, 10);
+        const unitPrice = parseFloat(priceRaw);
+        const total = qty * unitPrice;
+        const soldBy = auth.currentUser ? auth.currentUser.email : 'unknown';
+
+        try {
+            const response = await fetch(dbUrl('/sales.json'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    itemName, qty, unitPrice, total, soldBy,
+                    createdAt: new Date().toISOString()
+                })
+            });
+            if (!response.ok) throw new Error('Bad response: ' + response.status);
+
+            // Decrease stock if this sale matched a real stock item
+            if (stockIdx !== null) {
+                stockItems[stockIdx].qty = Math.max(0, stockItems[stockIdx].qty - qty);
+                renderStock();
+                saveStock();
+            }
+
+            e.target.reset();
+            loadSales();
+            loadDashboardCounts();
+        } catch (err) {
+            console.error('Failed to record sale', err);
+            errorBox.textContent = "Couldn't save this sale. Check your internet connection.";
+            errorBox.style.display = 'block';
+        }
+    });
+
 </script>
 </body>
 </html>
