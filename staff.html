@@ -880,8 +880,7 @@
         <p class="sub" id="scannerSub">Point the camera at the barcode</p>
         <div style="position:relative;">
             <video id="scannerVideo"></video>
-            <div id="ocrGuideBox" style="display:none; position:absolute; top:38%; left:8%; width:84%; height:24%; border:2px dashed var(--accent); border-radius:6px; pointer-events:none;"></div>
-        </div>
+            <div id="ocrGuideBox" style="display:none; position:absolute; top:44%; left:6%; width:88%; height:12%; border:2px dashed var(--accent); border-radius:6px; pointer-events:none;"></div>        </div>
         <canvas id="scannerCanvas" style="display:none;"></canvas>
         <button type="button" class="btn btn-primary" id="captureNameBtn" style="display:none; width:100%; justify-content:center; margin-top:12px;">📸 Capture</button>
     </div>
@@ -1076,16 +1075,30 @@
 
                     // Crop to the guide box area only (matches the dashed box on screen)
                     const vw = video.videoWidth, vh = video.videoHeight;
-                    const cropX = vw * 0.08, cropY = vh * 0.38;
-                    const cropW = vw * 0.84, cropH = vh * 0.24;
+                    const cropX = vw * 0.06, cropY = vh * 0.44;
+                    const cropW = vw * 0.88, cropH = vh * 0.12;
 
-                    scannerCanvas.width = cropW;
-                    scannerCanvas.height = cropH;
-                    scannerCanvas.getContext('2d').drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+                    // Upscale the crop 2x — small crops read much less reliably
+                    // Upscale the crop 3x — small crops read much less reliably
+                    const scale = 3;
+                    scannerCanvas.width = cropW * scale;
+                    scannerCanvas.height = cropH * scale;
+                    const ctx = scannerCanvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW * scale, cropH * scale);
+                    preprocessForOcr(ctx, scannerCanvas.width, scannerCanvas.height);
 
                     try {
-                        const { data } = await Tesseract.recognize(scannerCanvas, 'eng');
-                        const bigText = extractBigText(data.words || []);
+                        const { data } = await Tesseract.recognize(scannerCanvas, 'eng', {
+                            tessedit_pageseg_mode: '7' // treat crop as a single line of text
+                        });
+                        let bigText = extractBigText(data.words || []);
+                        // Fallback: if word-level parsing found nothing usable,
+                        // fall back to Tesseract's raw text output rather than
+                        // showing a blank field.
+                        if (!bigText && data.text) {
+                            bigText = data.text.replace(/\s+/g, ' ').trim();
+                        }
                         stopOcrCapture(stream);
                         onResult(bigText);
                     } catch (err) {
@@ -1101,26 +1114,49 @@
             });
     }
 
-    // Keeps only the tallest (biggest-font) words — drops small print like
-    // dosage instructions, batch numbers, warnings — and rejoins them in
-    // left-to-right, top-to-bottom reading order.
+    // Converts the captured crop to high-contrast black/white text.
+    // Photographed packaging usually has uneven lighting/glare, and
+    // this step alone often fixes OCR reads that the color image gets wrong.
+    function preprocessForOcr(ctx, w, h) {
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const px = imgData.data;
+
+        // Grayscale
+        for (let i = 0; i < px.length; i += 4) {
+            const gray = px[i] * 0.299 + px[i + 1] * 0.587 + px[i + 2] * 0.114;
+            px[i] = px[i + 1] = px[i + 2] = gray;
+        }
+
+        // Find the actual min/max brightness in this crop
+        let min = 255, max = 0;
+        for (let i = 0; i < px.length; i += 4) {
+            if (px[i] < min) min = px[i];
+            if (px[i] > max) max = px[i];
+        }
+        const range = Math.max(max - min, 1);
+
+        // Stretch contrast across the full 0–255 range instead of forcing
+        // pure black/white — this sharpens text without risking wiping it
+        // out entirely if the photo is a bit dark, bright, or low-contrast.
+        for (let i = 0; i < px.length; i += 4) {
+            const v = ((px[i] - min) / range) * 255;
+            px[i] = px[i + 1] = px[i + 2] = v;
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+    }
+
+    // Groups words into text lines (by vertical position), then keeps ONLY
+
+    // Groups words into text lines (by vertical position), then keeps ONLY
+    // the single tallest line — the biggest, most prominent line of text in
+    // the crop — and discards every other line (dosage text, batch numbers,
+    // subheadings, etc.), even if their height is fairly close.
     function extractBigText(words) {
-        const usable = words.filter(w => w.text.trim().length > 0 && w.confidence > 30);
+        const usable = words.filter(w => w.text.trim().length > 0 && w.confidence > 20);
         if (usable.length === 0) return '';
-
-        const heights = usable.map(w => w.bbox.y1 - w.bbox.y0);
-        const maxHeight = Math.max(...heights);
-        const threshold = maxHeight * 0.65; // keep words at least 65% as tall as the biggest word
-
-        const big = usable.filter(w => (w.bbox.y1 - w.bbox.y0) >= threshold);
-
-        big.sort((a, b) => {
-            const rowDiff = a.bbox.y0 - b.bbox.y0;
-            if (Math.abs(rowDiff) > maxHeight * 0.5) return rowDiff;
-            return a.bbox.x0 - b.bbox.x0;
-        });
-
-        return big.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
+        usable.sort((a, b) => a.bbox.x0 - b.bbox.x0);
+        return usable.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
     }
 
     function stopOcrCapture(stream) {
