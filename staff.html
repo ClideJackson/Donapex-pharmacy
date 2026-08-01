@@ -545,8 +545,82 @@
             background: #000;
         }
         .scanner-modal .sub { text-align: center; }
+
+        .receive-match-box {
+            background: var(--panel);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 14px;
+        }
+        .receive-match-box .field { margin-bottom: 10px; }
+        .receive-match-box .field label {
+            font-size: 0.78rem;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
+            display: block;
+        }
+        .receive-log {
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 16px;
+            border-top: 1px solid var(--line);
+            padding-top: 10px;
+        }
+        .receive-log-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            padding: 5px 0;
+            color: var(--ink-soft);
+        }
+        .receive-log-item strong { color: var(--ink); }
+
+        #scannerModal {
+            z-index: 200;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        }
+
+        .modal-close-x {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            line-height: 1;
+            color: var(--ink-soft);
+        }
+
     </style>
     <script src="https://unpkg.com/@zxing/library@0.21.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -625,6 +699,7 @@
 
         <div id="stockView">
             <p class="stock-header disclaimer">Note: stock data is shared and synced across any computer or phone that logs in — it's meant as a simple internal tracker, not a secure medical records system.</p>
+            <button type="button" class="btn btn-primary" id="openReceiveModalBtn" style="margin-bottom:20px;">📦 Receive Stock (Scan)</button>
             <div class="modal-error" id="stockLoadError" style="display:none; margin-bottom:16px;">Couldn't reach the stock database. Check your internet connection and try logging out and back in.</div>
 
             <form class="stock-add-form" id="addStockForm">
@@ -801,13 +876,258 @@
 <div class="modal-overlay" id="scannerModal">
     <div class="modal-box scanner-modal">
         <button class="modal-close-x" id="closeScannerModal">&times;</button>
-        <h3>Scan Barcode</h3>
-        <p class="sub">Point the camera at the barcode</p>
+        <h3 id="scannerTitle">Scan Barcode</h3>
+        <p class="sub" id="scannerSub">Point the camera at the barcode</p>
         <video id="scannerVideo"></video>
+        <canvas id="scannerCanvas" style="display:none;"></canvas>
+        <button type="button" class="btn btn-primary" id="captureNameBtn" style="display:none; width:100%; justify-content:center; margin-top:12px;">📸 Capture</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="receiveModal">
+    <div class="modal-box" style="max-width:460px;">
+        <button class="modal-close-x" id="closeReceiveModal">&times;</button>
+        <h3>Receive Stock</h3>
+        <p class="sub">Scan an item, confirm quantity, repeat.</p>
+
+        <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-primary" id="receiveScanBtn" style="flex:1; justify-content:center;">📷 Scan Barcode</button>
+            <button type="button" class="btn btn-primary" id="receiveScanNameBtn" style="flex:1; justify-content:center;">🔤 Scan Name</button>
+        </div>
+        <div id="receiveMatchBox" class="receive-match-box" style="display:none;"></div>
+        <div id="ocrConfirmBox" class="receive-match-box" style="display:none;"></div>
+        <div class="receive-log" id="receiveLog"></div>
     </div>
 </div>
 
 <script type="module">
+
+    // ── Receive Stock (bulk scan) ────────────────────────────────────
+    const receiveModal = document.getElementById('receiveModal');
+    const openReceiveModalBtn = document.getElementById('openReceiveModalBtn');
+    const closeReceiveModal = document.getElementById('closeReceiveModal');
+    const receiveScanBtn = document.getElementById('receiveScanBtn');
+    const receiveMatchBox = document.getElementById('receiveMatchBox');
+    const receiveLog = document.getElementById('receiveLog');
+
+    openReceiveModalBtn.addEventListener('click', () => {
+        receiveMatchBox.style.display = 'none';
+        receiveModal.classList.add('open');
+    });
+    closeReceiveModal.addEventListener('click', () => receiveModal.classList.remove('open'));
+    receiveModal.addEventListener('click', (e) => {
+        if (e.target === receiveModal) receiveModal.classList.remove('open');
+    });
+
+    receiveScanBtn.addEventListener('click', () => {
+        receiveModal.classList.remove('open');
+        receiveModal.classList.add('was-open');
+        openScanner(null, (code) => {
+            receiveModal.classList.remove('was-open');
+            receiveModal.classList.add('open');
+            const matchIdx = stockItems.findIndex(item => item.barcode === code);
+            if (matchIdx !== -1) {
+                showMatchedItemForm(matchIdx, code);
+            } else {
+                showNewItemForm(code);
+            }
+        });
+    });
+
+
+
+    function stockStatusLine(item) {
+        const now = new Date();
+        const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const soon = new Date(todayMidnight);
+        soon.setDate(todayMidnight.getDate() + 30);
+
+        const isLow = item.threshold != null && item.qty <= item.threshold;
+        let isExpired = false, isExpiring = false;
+        if (item.expiry) {
+            const [y, m, d] = item.expiry.split('-').map(Number);
+            const expiryDate = new Date(y, m - 1, d);
+            if (expiryDate < todayMidnight) isExpired = true;
+            else if (expiryDate <= soon) isExpiring = true;
+        }
+
+        let tags = '';
+        if (isExpired) tags += '<span class="tag expired">Expired</span>';
+        if (!isExpired && isLow) tags += '<span class="tag low">Low stock</span>';
+        if (!isExpired && isExpiring) tags += '<span class="tag exp">Expiring soon</span>';
+
+        return `${item.qty} in stock${item.expiry ? ` · expires ${item.expiry}` : ' · no expiry set'} ${tags}`;
+    }
+
+    function showMatchedItemForm(idx, barcode) {
+        const item = stockItems[idx];
+        receiveMatchBox.style.display = 'block';
+        receiveMatchBox.innerHTML = `
+        <strong>${escapeHtml(item.name)}</strong>
+        <div style="margin-top:4px; font-size:0.85rem;">${stockStatusLine(item)}</div>
+        <div class="field" style="margin-top:12px;">
+            <label>Quantity received</label>
+            <input type="number" id="receiveQtyInput" min="1" placeholder="e.g. 20">
+        </div>
+        <div class="field">
+            <label>New expiry date${item.expiry ? ' (currently ' + item.expiry + ')' : ''}</label>
+            <input type="date" id="receiveExpiryInput" value="${item.expiry || ''}">
+        </div>
+        <button type="button" class="btn btn-primary" id="confirmReceiveBtn" style="width:100%; justify-content:center;">Add to Stock</button>
+    `;
+        document.getElementById('confirmReceiveBtn').addEventListener('click', () => {
+            const qtyReceived = parseInt(document.getElementById('receiveQtyInput').value, 10);
+            const newExpiry = document.getElementById('receiveExpiryInput').value;
+            if (!qtyReceived || qtyReceived <= 0) return;
+            stockItems[idx].qty += qtyReceived;
+            if (newExpiry) stockItems[idx].expiry = newExpiry;
+            renderStock();
+            saveStock();
+            logReceived(`${item.name} (+${qtyReceived})`);
+            receiveMatchBox.style.display = 'none';
+        });
+    }
+
+    function showNewItemForm(barcode) {
+        receiveMatchBox.style.display = 'block';
+        receiveMatchBox.innerHTML = `
+        <strong>New item</strong> — barcode not recognized yet
+        <div class="field" style="margin-top:10px;">
+            <label>Item name</label>
+            <input type="text" id="newItemNameInput" placeholder="e.g. Panado 500mg">
+        </div>
+        <div class="field">
+            <label>Quantity received</label>
+            <input type="number" id="newItemQtyInput" min="1" placeholder="e.g. 20">
+        </div>
+        <div class="field">
+            <label>Expiry date</label>
+            <input type="date" id="newItemExpiryInput">
+        </div>
+        <div class="field">
+            <label>Low-stock alert below</label>
+            <input type="number" id="newItemThresholdInput" min="0" placeholder="10">
+        </div>
+        <button type="button" class="btn btn-primary" id="confirmNewItemBtn" style="width:100%; justify-content:center;">Save New Item</button>
+    `;
+        document.getElementById('confirmNewItemBtn').addEventListener('click', () => {
+            const name = document.getElementById('newItemNameInput').value.trim();
+            const qty = parseInt(document.getElementById('newItemQtyInput').value, 10);
+            const expiry = document.getElementById('newItemExpiryInput').value;
+            const thresholdVal = document.getElementById('newItemThresholdInput').value;
+            const threshold = thresholdVal ? parseInt(thresholdVal, 10) : null;
+            if (!name || !qty || qty <= 0) return;
+            stockItems.push({name, qty, threshold, expiry, category: '', barcode});
+            renderStock();
+            saveStock();
+            logReceived(`${name} (new, +${qty})`);
+            receiveMatchBox.style.display = 'none';
+        });
+    }
+
+    function logReceived(text) {
+        const entry = document.createElement('div');
+        entry.className = 'receive-log-item';
+        entry.innerHTML = `<span>${escapeHtml(text)}</span><span>${new Date().toLocaleTimeString()}</span>`;
+        receiveLog.prepend(entry);
+    }
+
+    // ── Scan Name (OCR) ──────────────────────────────────────────────
+    const receiveScanNameBtn = document.getElementById('receiveScanNameBtn');
+    const ocrConfirmBox = document.getElementById('ocrConfirmBox');
+    const scannerCanvas = document.getElementById('scannerCanvas');
+    const captureNameBtn = document.getElementById('captureNameBtn');
+    const scannerTitle = document.getElementById('scannerTitle');
+    const scannerSub = document.getElementById('scannerSub');
+    let activeOcrStream = null;
+
+    receiveScanNameBtn.addEventListener('click', () => {
+        receiveModal.classList.remove('open');
+        receiveModal.classList.add('was-open');
+        openOcrCapture((name) => {
+            receiveModal.classList.remove('was-open');
+            receiveModal.classList.add('open');
+            showOcrConfirmBox(name);
+        });
+    });
+
+    function openOcrCapture(onResult) {
+        scannerTitle.textContent = 'Scan Item Name';
+        scannerSub.textContent = 'Point the camera at the name, then tap Capture';
+        captureNameBtn.style.display = 'flex';
+        scannerModal.classList.add('open');
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(stream => {
+                activeOcrStream = stream;
+                const video = document.getElementById('scannerVideo');
+                video.srcObject = stream;
+                video.play();
+
+                captureNameBtn.onclick = async () => {
+                    captureNameBtn.disabled = true;
+                    captureNameBtn.textContent = 'Reading…';
+
+                    scannerCanvas.width = video.videoWidth;
+                    scannerCanvas.height = video.videoHeight;
+                    scannerCanvas.getContext('2d').drawImage(video, 0, 0);
+
+                    try {
+                        const { data: { text } } = await Tesseract.recognize(scannerCanvas, 'eng');
+                        const cleaned = text.replace(/\s+/g, ' ').trim();
+                        stopOcrCapture(stream);
+                        onResult(cleaned);
+                    } catch (err) {
+                        console.error('OCR failed', err);
+                        stopOcrCapture(stream);
+                        onResult('');
+                    }
+                };
+            })
+            .catch(err => {
+                console.error('Camera access failed', err);
+                scannerModal.classList.remove('open');
+            });
+    }
+
+    function stopOcrCapture(stream) {
+        stream.getTracks().forEach(t => t.stop());
+        activeOcrStream = null;
+        captureNameBtn.style.display = 'none';
+        captureNameBtn.disabled = false;
+        captureNameBtn.textContent = '📸 Capture';
+        scannerTitle.textContent = 'Scan Barcode';
+        scannerSub.textContent = 'Point the camera at the barcode';
+        scannerModal.classList.remove('open');
+        if (receiveModal.classList.contains('was-open')) {
+            receiveModal.classList.add('open');
+            receiveModal.classList.remove('was-open');
+        }
+    }
+
+    function showOcrConfirmBox(detectedName) {
+        ocrConfirmBox.style.display = 'block';
+        ocrConfirmBox.innerHTML = `
+        <div class="field">
+            <label>Detected name — edit if needed</label>
+            <input type="text" id="ocrNameInput" value="${escapeHtml(detectedName)}" placeholder="Item name">
+        </div>
+        <button type="button" class="btn btn-primary" id="confirmOcrNameBtn" style="width:100%; justify-content:center;">Continue</button>
+    `;
+        document.getElementById('confirmOcrNameBtn').addEventListener('click', () => {
+            const name = document.getElementById('ocrNameInput').value.trim();
+            if (!name) return;
+            ocrConfirmBox.style.display = 'none';
+
+            const matchIdx = stockItems.findIndex(item => item.name.toLowerCase() === name.toLowerCase());
+            if (matchIdx !== -1) {
+                showMatchedItemForm(matchIdx, stockItems[matchIdx].barcode || '');
+            } else {
+                showNewItemForm('');
+                document.getElementById('newItemNameInput').value = name;
+            }
+        });
+    }
     // ── Firebase setup ─────────────────────────────────────────────
     // PASTE YOUR firebaseConfig FROM Project settings → Your apps BELOW.
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -1637,11 +1957,21 @@
     function stopScanner() {
         codeReader.reset();
         scannerModal.classList.remove('open');
+        if (receiveModal.classList.contains('was-open')) {
+            receiveModal.classList.add('open');
+            receiveModal.classList.remove('was-open');
+        }
     }
 
-    closeScannerModal.addEventListener('click', stopScanner);
+    closeScannerModal.addEventListener('click', () => {
+        if (activeOcrStream) stopOcrCapture(activeOcrStream);
+        else stopScanner();
+    });
     scannerModal.addEventListener('click', (e) => {
-        if (e.target === scannerModal) stopScanner();
+        if (e.target === scannerModal) {
+            if (activeOcrStream) stopOcrCapture(activeOcrStream);
+            else stopScanner();
+        }
     });
 
     // Stock form's scan button
