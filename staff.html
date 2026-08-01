@@ -925,14 +925,16 @@
     receiveScanBtn.addEventListener('click', () => {
         receiveModal.classList.remove('open');
         receiveModal.classList.add('was-open');
-        openScanner(null, (code) => {
+        openScanner(null, async (code) => {
             receiveModal.classList.remove('was-open');
             receiveModal.classList.add('open');
             const matchIdx = stockItems.findIndex(item => item.barcode === code);
             if (matchIdx !== -1) {
                 showMatchedItemForm(matchIdx, code);
             } else {
-                showNewItemForm(code);
+                showNewItemForm(code, 'Looking up product…');
+                const result = await lookupBarcodeProduct(code);
+                showNewItemForm(code, '', result.name, result.status);
             }
         });
     });
@@ -991,13 +993,24 @@
         });
     }
 
-    function showNewItemForm(barcode) {
+    function showNewItemForm(barcode, loadingText, prefillName, lookupStatus) {
         receiveMatchBox.style.display = 'block';
+
+        if (loadingText) {
+            receiveMatchBox.innerHTML = `<div style="text-align:center; padding:10px 0; color:var(--ink-soft);">${escapeHtml(loadingText)}</div>`;
+            return;
+        }
+
+        let statusLine = 'barcode not recognized';
+        if (prefillName) statusLine = 'found a possible match, confirm below';
+        else if (lookupStatus === 'error') statusLine = 'lookup failed (check connection) — enter manually';
+        else if (lookupStatus === 'not_found') statusLine = `barcode ${escapeHtml(barcode)} not found in product database — enter manually`;
+
         receiveMatchBox.innerHTML = `
-        <strong>New item</strong> — barcode not recognized yet
+        <strong>New item</strong> — ${statusLine}
         <div class="field" style="margin-top:10px;">
             <label>Item name</label>
-            <input type="text" id="newItemNameInput" placeholder="e.g. Panado 500mg">
+            <input type="text" id="newItemNameInput" placeholder="e.g. Panado 500mg" value="${escapeHtml(prefillName || '')}">
         </div>
         <div class="field">
             <label>Quantity received</label>
@@ -1026,6 +1039,52 @@
             logReceived(`${name} (new, +${qty})`);
             receiveMatchBox.style.display = 'none';
         });
+    }
+
+    // Looks up an unrecognized barcode against the free Open Food Facts
+    // database. Returns a product name string, or '' if nothing was found
+    // (network issues, unknown barcode, etc. all just fall back silently).
+    // Looks up an unrecognized barcode against the free Open Food Facts
+    // database. Tries the scanned code as-is, then with a leading zero
+    // added/removed (EAN-13 vs UPC-A variants of the same barcode) since
+    // scanners and product regions don't always agree on the format.
+    // Returns { name, status } where status is 'found' | 'not_found' | 'error'.
+    async function lookupBarcodeProduct(barcode) {
+        const digitsOnly = barcode.replace(/\D/g, '');
+        const variants = [digitsOnly];
+        if (digitsOnly.length === 12) variants.push('0' + digitsOnly);
+        if (digitsOnly.length === 13 && digitsOnly.startsWith('0')) variants.push(digitsOnly.slice(1));
+
+        let sawError = false;
+
+        for (const code of variants) {
+            try {
+                const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json`);
+                // A 404 just means "barcode not in this database" — that's a
+                // normal, expected result, not a network/connection error.
+                if (response.status === 404) continue;
+                if (!response.ok) { sawError = true; continue; }
+                const data = await response.json();
+                if (data.status !== 1 || !data.product) continue;
+
+                const name = data.product.product_name || data.product.product_name_en || data.product.generic_name || '';
+                const brand = data.product.brands || '';
+                if (!name) continue;
+
+                const fullName = (brand && !name.toLowerCase().includes(brand.toLowerCase()))
+                    ? `${brand} ${name}`.trim()
+                    : name.trim();
+
+                console.log('Barcode lookup matched', code, '→', fullName);
+                return { name: fullName, status: 'found' };
+            } catch (err) {
+                console.error('Barcode lookup request failed for', code, err);
+                sawError = true;
+            }
+        }
+
+        console.log('Barcode lookup: no match for', digitsOnly, variants);
+        return { name: '', status: sawError ? 'error' : 'not_found' };
     }
 
     function logReceived(text) {
@@ -1193,8 +1252,7 @@
             if (matchIdx !== -1) {
                 showMatchedItemForm(matchIdx, stockItems[matchIdx].barcode || '');
             } else {
-                showNewItemForm('');
-                document.getElementById('newItemNameInput').value = name;
+                showNewItemForm('', '', name);
             }
         });
     }
