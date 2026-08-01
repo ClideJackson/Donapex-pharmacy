@@ -227,7 +227,7 @@
 
         .stock-add-form {
             display: grid;
-            grid-template-columns: repeat(5, 1fr) auto;
+            grid-template-columns: repeat(6, 1fr) auto;
             gap: 10px;
             background: var(--white);
             border: 1px solid var(--line);
@@ -528,8 +528,25 @@
         @media (max-width: 900px) {
             .sale-form { grid-template-columns: 1fr 1fr; }
         }
-
+        .scan-btn {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            white-space: nowrap;
+        }
+        .scanner-modal video {
+            width: 100%;
+            border-radius: 10px;
+            background: #000;
+        }
+        .scanner-modal .sub { text-align: center; }
     </style>
+    <script src="https://unpkg.com/@zxing/library@0.21.3"></script>
 </head>
 <body>
 
@@ -634,6 +651,13 @@
                     <label for="itemCategory">Category</label>
                     <input type="text" id="itemCategory" placeholder="e.g. Pain relief">
                 </div>
+                <div class="field">
+                    <label for="itemBarcode">Barcode</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="itemBarcode" placeholder="Scan or type">
+                        <button type="button" class="scan-btn" data-target="itemBarcode">📷</button>
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary">Add item</button>
             </form>
 
@@ -735,7 +759,10 @@
                     <select id="saleItemSelect">
                         <option value="">-- Select from stock --</option>
                     </select>
-                    <input type="text" id="saleItemCustom" placeholder="Or type item name" style="margin-top:6px;">
+                    <div style="display:flex; gap:6px; margin-top:6px;">
+                        <input type="text" id="saleItemCustom" placeholder="Or type item name">
+                        <button type="button" class="scan-btn" id="scanSaleBarcodeBtn">📷 Scan</button>
+                    </div>
                 </div>
                 <div class="field">
                     <label for="saleQty">Quantity</label>
@@ -770,6 +797,15 @@
         </div>
     </div>
 </section>
+
+<div class="modal-overlay" id="scannerModal">
+    <div class="modal-box scanner-modal">
+        <button class="modal-close-x" id="closeScannerModal">&times;</button>
+        <h3>Scan Barcode</h3>
+        <p class="sub">Point the camera at the barcode</p>
+        <video id="scannerVideo"></video>
+    </div>
+</div>
 
 <script type="module">
     // ── Firebase setup ─────────────────────────────────────────────
@@ -1162,6 +1198,7 @@
         const threshold = thresholdVal ? parseInt(thresholdVal, 10) : null;
         const expiry = document.getElementById('itemExpiry').value;
         const category = document.getElementById('itemCategory').value.trim();
+        const barcode = document.getElementById('itemBarcode').value.trim();
 
         if (!name) {
             errorBox.textContent = 'Please enter an item name.';
@@ -1175,7 +1212,7 @@
         }
 
         const qty = parseInt(qtyRaw, 10);
-        stockItems.push({name, qty, threshold, expiry, category});
+        stockItems.push({name, qty, threshold, expiry, category, barcode});
         renderStock();
         saveStock();
         e.target.reset();
@@ -1570,6 +1607,60 @@
             errorBox.textContent = "Couldn't save this sale. Check your internet connection.";
             errorBox.style.display = 'block';
         }
+    });
+
+    // ── Barcode scanning ──────────────────────────────────────────
+    const codeReader = new ZXing.BrowserMultiFormatReader();
+    const scannerModal = document.getElementById('scannerModal');
+    const closeScannerModal = document.getElementById('closeScannerModal');
+    let scanTargetInputId = null;
+    let scanCallback = null;
+
+    function openScanner(targetInputId, onResult) {
+        scanTargetInputId = targetInputId;
+        scanCallback = onResult || null;
+        scannerModal.classList.add('open');
+
+        codeReader.decodeFromVideoDevice(undefined, 'scannerVideo', (result, err) => {
+            if (result) {
+                const code = result.getText();
+                stopScanner();
+                if (scanCallback) {
+                    scanCallback(code);
+                } else if (scanTargetInputId) {
+                    document.getElementById(scanTargetInputId).value = code;
+                }
+            }
+        });
+    }
+
+    function stopScanner() {
+        codeReader.reset();
+        scannerModal.classList.remove('open');
+    }
+
+    closeScannerModal.addEventListener('click', stopScanner);
+    scannerModal.addEventListener('click', (e) => {
+        if (e.target === scannerModal) stopScanner();
+    });
+
+    // Stock form's scan button
+    document.querySelectorAll('.scan-btn[data-target]').forEach(btn => {
+        btn.addEventListener('click', () => openScanner(btn.dataset.target));
+    });
+
+    // Sales form's scan button — tries to auto-match a stock item by barcode
+    document.getElementById('scanSaleBarcodeBtn').addEventListener('click', () => {
+        openScanner(null, (code) => {
+            const matchIdx = stockItems.findIndex(item => item.barcode === code);
+            if (matchIdx !== -1) {
+                document.getElementById('saleItemSelect').value = matchIdx;
+                document.getElementById('saleItemCustom').value = '';
+            } else {
+                document.getElementById('saleItemSelect').value = '';
+                document.getElementById('saleItemCustom').value = `Unrecognized barcode: ${code}`;
+            }
+        });
     });
 
 </script>
