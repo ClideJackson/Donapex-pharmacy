@@ -878,7 +878,10 @@
         <button class="modal-close-x" id="closeScannerModal">&times;</button>
         <h3 id="scannerTitle">Scan Barcode</h3>
         <p class="sub" id="scannerSub">Point the camera at the barcode</p>
-        <video id="scannerVideo"></video>
+        <div style="position:relative;">
+            <video id="scannerVideo"></video>
+            <div id="ocrGuideBox" style="display:none; position:absolute; top:38%; left:8%; width:84%; height:24%; border:2px dashed var(--accent); border-radius:6px; pointer-events:none;"></div>
+        </div>
         <canvas id="scannerCanvas" style="display:none;"></canvas>
         <button type="button" class="btn btn-primary" id="captureNameBtn" style="display:none; width:100%; justify-content:center; margin-top:12px;">📸 Capture</button>
     </div>
@@ -912,6 +915,7 @@
 
     openReceiveModalBtn.addEventListener('click', () => {
         receiveMatchBox.style.display = 'none';
+        ocrConfirmBox.style.display = 'none';
         receiveModal.classList.add('open');
     });
     closeReceiveModal.addEventListener('click', () => receiveModal.classList.remove('open'));
@@ -1039,6 +1043,7 @@
     const captureNameBtn = document.getElementById('captureNameBtn');
     const scannerTitle = document.getElementById('scannerTitle');
     const scannerSub = document.getElementById('scannerSub');
+    const ocrGuideBox = document.getElementById('ocrGuideBox');
     let activeOcrStream = null;
 
     receiveScanNameBtn.addEventListener('click', () => {
@@ -1053,8 +1058,9 @@
 
     function openOcrCapture(onResult) {
         scannerTitle.textContent = 'Scan Item Name';
-        scannerSub.textContent = 'Point the camera at the name, then tap Capture';
+        scannerSub.textContent = 'Line up the name inside the box, then tap Capture';
         captureNameBtn.style.display = 'flex';
+        ocrGuideBox.style.display = 'block';
         scannerModal.classList.add('open');
 
         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
@@ -1068,15 +1074,20 @@
                     captureNameBtn.disabled = true;
                     captureNameBtn.textContent = 'Reading…';
 
-                    scannerCanvas.width = video.videoWidth;
-                    scannerCanvas.height = video.videoHeight;
-                    scannerCanvas.getContext('2d').drawImage(video, 0, 0);
+                    // Crop to the guide box area only (matches the dashed box on screen)
+                    const vw = video.videoWidth, vh = video.videoHeight;
+                    const cropX = vw * 0.08, cropY = vh * 0.38;
+                    const cropW = vw * 0.84, cropH = vh * 0.24;
+
+                    scannerCanvas.width = cropW;
+                    scannerCanvas.height = cropH;
+                    scannerCanvas.getContext('2d').drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
                     try {
-                        const { data: { text } } = await Tesseract.recognize(scannerCanvas, 'eng');
-                        const cleaned = text.replace(/\s+/g, ' ').trim();
+                        const { data } = await Tesseract.recognize(scannerCanvas, 'eng');
+                        const bigText = extractBigText(data.words || []);
                         stopOcrCapture(stream);
-                        onResult(cleaned);
+                        onResult(bigText);
                     } catch (err) {
                         console.error('OCR failed', err);
                         stopOcrCapture(stream);
@@ -1090,12 +1101,35 @@
             });
     }
 
+    // Keeps only the tallest (biggest-font) words — drops small print like
+    // dosage instructions, batch numbers, warnings — and rejoins them in
+    // left-to-right, top-to-bottom reading order.
+    function extractBigText(words) {
+        const usable = words.filter(w => w.text.trim().length > 0 && w.confidence > 30);
+        if (usable.length === 0) return '';
+
+        const heights = usable.map(w => w.bbox.y1 - w.bbox.y0);
+        const maxHeight = Math.max(...heights);
+        const threshold = maxHeight * 0.65; // keep words at least 65% as tall as the biggest word
+
+        const big = usable.filter(w => (w.bbox.y1 - w.bbox.y0) >= threshold);
+
+        big.sort((a, b) => {
+            const rowDiff = a.bbox.y0 - b.bbox.y0;
+            if (Math.abs(rowDiff) > maxHeight * 0.5) return rowDiff;
+            return a.bbox.x0 - b.bbox.x0;
+        });
+
+        return big.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
+    }
+
     function stopOcrCapture(stream) {
         stream.getTracks().forEach(t => t.stop());
         activeOcrStream = null;
         captureNameBtn.style.display = 'none';
         captureNameBtn.disabled = false;
         captureNameBtn.textContent = '📸 Capture';
+        ocrGuideBox.style.display = 'none';
         scannerTitle.textContent = 'Scan Barcode';
         scannerSub.textContent = 'Point the camera at the barcode';
         scannerModal.classList.remove('open');
